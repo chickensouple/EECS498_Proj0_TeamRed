@@ -12,6 +12,7 @@ from numpy.random import randn
 from waypointShared import *
 
 from pdb import set_trace as DEBUG
+from autonomous import *
 
 
 MSG_TEMPLATE = {
@@ -97,6 +98,24 @@ class RobotSimInterface( object ):
     self.tagPos = asfarray(MSG_TEMPLATE[ ROBOT_TAGID[0]])
     self.laserAxis = dot([[1,1,0,0],[0,0,1,1]],self.tagPos)/2
     self.waypoints = { tid : asfarray(MSG_TEMPLATE[tid]) for tid in waypoints }
+
+
+
+    self.autonomous = AutonomousPlanner()
+    self.borderPoints = { tid : sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners}
+    self.borderPointsReal = { 
+      22: [2, 1],
+      23: [1, 0],
+      24: [1, 2],
+      25: [0, 1],
+      26: [0, 0],
+      27: [2, 0],
+      28: [0, 2],
+      29: [2, 2]}
+
+    self.autonomous.calculateRotation(self.borderPoints, self.borderPointsReal)
+    
+
     ### Initialize internal variables
     # Two points on the laser screen
     self.laserScreen = asfarray([[-1,-1],[1,-1]])
