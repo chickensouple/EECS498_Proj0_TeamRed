@@ -11,7 +11,6 @@ class AutonomousPlanner:
 		y = zeros(size * 2)
 		H = zeros([size * 2, 6])
 		count = 0
-		print(sensorPts)
 		for key, sensorPt in sensorPts.iteritems():
 			realPt = realPts[key]
 			y[2 * count] = realPt[0]
@@ -26,7 +25,7 @@ class AutonomousPlanner:
 
 			count += 1
 		coeffs = linalg.lstsq(H, transpose(y))[0]
-		T = array([[coeffs[0], coeffs[1], coeffs[2]],
+		self.T = array([[coeffs[0], coeffs[1], coeffs[2]],
 			[coeffs[3], coeffs[4], coeffs[5]],
 			[0, 0, 1]])
 
