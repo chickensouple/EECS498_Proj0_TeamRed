@@ -72,17 +72,17 @@ class RobotSimulatorApp( JoyApp ):
 
     if evt.type == KEYDOWN:
       if evt.key == K_UP:
-        self.robSim.moveY(-1)
+        self.robSim.moveY(1)
         return progress("(say) Move up")
       elif evt.key == K_DOWN:
         # self.robSim.move(-0.5)
-        self.robSim.moveY(1)
+        self.robSim.moveY(-1)
         return progress("(say) Move down")
       elif evt.key == K_LEFT:
-        self.robSim.moveX(1)
+        self.robSim.moveX(-1)
         return progress("(say) Move left")
       elif evt.key == K_RIGHT:
-        self.robSim.moveX(-1)
+        self.robSim.moveX(1)
         return progress("(say) Move right")
     # Use superclass to show any other events
       else:
