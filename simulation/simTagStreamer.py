@@ -1,7 +1,7 @@
 # file simTagStreamer.py simulates a robot in an arena
 
 from sensorPlanTCP import SensorPlanTCP
-from robotSim2 import DummyRobotSim
+from RedRobotSim import DummyRobotSim
 from joy import JoyApp, progress
 from joy.decl import *
 from waypointShared import WAYPOINT_HOST, APRIL_DATA_PORT
@@ -72,17 +72,18 @@ class RobotSimulatorApp( JoyApp ):
 
     if evt.type == KEYDOWN:
       if evt.key == K_UP:
-        self.robSim.move(0.5)
-        return progress("(say) Move forward")
+        self.robSim.moveY(-1)
+        return progress("(say) Move up")
       elif evt.key == K_DOWN:
-        self.robSim.move(-0.5)
-        return progress("(say) Move back")
+        # self.robSim.move(-0.5)
+        self.robSim.moveY(1)
+        return progress("(say) Move down")
       elif evt.key == K_LEFT:
-        self.robSim.turn(-0.5)
-        return progress("(say) Turn left")
+        self.robSim.moveX(1)
+        return progress("(say) Move left")
       elif evt.key == K_RIGHT:
-        self.robSim.turn(0.5)
-        return progress("(say) Turn right")
+        self.robSim.moveX(-1)
+        return progress("(say) Move right")
     # Use superclass to show any other events
       else:
         return JoyApp.onEvent(self,evt)

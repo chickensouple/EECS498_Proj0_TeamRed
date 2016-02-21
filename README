@@ -1,0 +1,7 @@
+for simulation
+pyckbot/apps/hrb
+
+ipython --pylab
+execfile('waypointTask.py')
+
+python simtagStreamer.py localhost

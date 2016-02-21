@@ -147,7 +147,35 @@ class DummyRobotSim( RobotSimInterface ):
     RobotSimInterface.__init__(self, *args, **kw)
     self.dNoise = 0.1
     self.aNoise = 0.1
+
+    self.wheelNumSides = 6;
+    self.wheelSideLength = 4; # what units?
+    self.wheelXNoise = 0.1
+
     
+  def moveX( self, dist ):
+    """
+    Move forward some distance in the X direction
+    dist is the number of sides the wheel will turn
+    must be an integer
+    """
+
+    distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
+    self.tagPos = self.tagPos + distMoved[newaxis, :]
+
+
+  def moveY(self, dist):
+    """
+    Move forward some distance in the Y direction
+    dist is the number of sides the wheel will turn
+    must be an integer
+    """
+    distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
+    print(self.tagPos)
+    print(distMoved)
+    self.tagPos = self.tagPos + distMoved[newaxis, :]
+    print(self.tagPos)
+
   def move( self, dist ):
     """
     Move forward some distance
