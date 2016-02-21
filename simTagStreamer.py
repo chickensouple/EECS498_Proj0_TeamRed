@@ -1,7 +1,7 @@
 # file simTagStreamer.py simulates a robot in an arena
 
 from sensorPlanTCP import SensorPlanTCP
-from RedRobotSim import DummyRobotSim
+from redRobotSim import DummyRobotSim
 from joy import JoyApp, progress
 from joy.decl import *
 from waypointShared import WAYPOINT_HOST, APRIL_DATA_PORT
