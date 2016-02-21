@@ -5,7 +5,6 @@ class AutonomousPlanner:
 		pass
 
 	def calculateRotation(self, sensorPts, realPts):
-		# constructing y
 		size = len(sensorPts)
 
 		y = zeros(size * 2)

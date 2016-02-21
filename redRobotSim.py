@@ -102,8 +102,8 @@ class RobotSimInterface( object ):
 
 
     self.autonomous = AutonomousPlanner()
-    self.borderPoints = { tid : sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners}
-    self.borderPointsReal = { 
+    borderPoints = { tid : sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners}
+    borderPointsReal = { 
       22: [2, 1],
       23: [1, 0],
       24: [1, 2],
@@ -113,7 +113,7 @@ class RobotSimInterface( object ):
       28: [0, 2],
       29: [2, 2]}
 
-    self.autonomous.calculateRotation(self.borderPoints, self.borderPointsReal)
+    self.autonomous.calculateRotation(borderPoints, borderPointsReal)
     
 
     ### Initialize internal variables
