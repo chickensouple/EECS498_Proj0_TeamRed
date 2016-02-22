@@ -3,6 +3,8 @@ from numpy import *
 class AutonomousPlanner:
 	def __init__(self):
 		pass
+		self.lineDist = 0
+		self.lineDev = 0
 
 	def calculateRotation(self, sensorPts, realPts):
 		size = len(sensorPts)
@@ -28,7 +30,8 @@ class AutonomousPlanner:
 			[coeffs[3], coeffs[4], coeffs[5]],
 			[0, 0, 1]])
 
-
+	def getNextStep( self, robSim, sensorData ):
+		
 
 
 

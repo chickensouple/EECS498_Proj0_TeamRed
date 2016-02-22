@@ -171,6 +171,7 @@ class DummyRobotSim( RobotSimInterface ):
     self.wheelSideLength = 4; # what units?
     self.wheelXNoise = 0.1
 
+    self.autoStep = false
     
   def moveX( self, dist ):
     """
@@ -226,3 +227,17 @@ class DummyRobotSim( RobotSimInterface ):
     da = dot([1,-1],self.laserAxis)
     self.laserAxis[1] += randn(2) * sqrt(sum(da*da)) * 0.01
     
+
+  def autoTask( self ):
+    """
+    Operate next step in autonomous plan
+    Should update every (1/20.0) seconds, based on self.timeForAuto in simTagStreamer
+    """
+    #If operating step, check odometry
+    if self.autoStep:
+      #check odo, if correct, stop motor
+       
+    #Otherwise, start operating next planned step
+    if !self.autoStep:
+      # from autonomous.py, what is next step direction?
+      # motor command
