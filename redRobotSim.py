@@ -112,9 +112,7 @@ class RobotSimInterface( object ):
       27: [2, 0],
       28: [0, 2],
       29: [2, 2]}
-
-    self.autonomous.calculateRotation(borderPoints, borderPointsReal)
-    
+    self.autonomous.calculateTransformation(borderPoints, borderPointsReal)
 
     ### Initialize internal variables
     # Two points on the laser screen
@@ -168,8 +166,8 @@ class DummyRobotSim( RobotSimInterface ):
     self.aNoise = 0.1
 
     self.wheelNumSides = 6;
-    self.wheelSideLength = 4; # what units?
-    self.wheelXNoise = 0.1
+    self.wheelSideLength = 0.08; # meters
+    self.wheelXNoise = 0.01
 
     self.autoStep = false
     
@@ -180,8 +178,9 @@ class DummyRobotSim( RobotSimInterface ):
     must be an integer
     """
 
-    distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
-    self.tagPos = self.tagPos + distMoved[newaxis, :]
+    distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
+    rotatedDist = self.autonomous.rotateRealToArbitrary(distMoved)
+    self.tagPos = self.tagPos + rotatedDist[newaxis, :]
 
 
   def moveY(self, dist):
@@ -190,30 +189,9 @@ class DummyRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
-    distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
-    print(self.tagPos)
-    print(distMoved)
-    self.tagPos = self.tagPos + distMoved[newaxis, :]
-    print(self.tagPos)
-
-  def move( self, dist ):
-    """
-    Move forward some distance
-    """
-    # Compute a vector along the forward direction
-    fwd = dot([1,-1,-1,1],self.tagPos)/2
-    # Move all tag corners forward by distance, with some noise
-    self.tagPos = self.tagPos + fwd[newaxis,:] * dist * (1+randn()*self.dNoise)
-
-  def turn( self, angle ):
-    """
-    Turn by some angle
-    """
-    z = dot(self.tagPos,[1,1j])
-    c = mean(z)
-    zr = c + (z-c) * exp(1j * (angle+randn()*self.aNoise))
-    self.tagPos[:,0] = zr.real
-    self.tagPos[:,1] = zr.imag
+    distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
+    rotatedDist = self.autonomous.rotateRealToArbitrary(distMoved)
+    self.tagPos = self.tagPos + rotatedDist[newaxis, :]
     
   def refreshState( self ):
     """
