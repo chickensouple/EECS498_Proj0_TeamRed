@@ -12,7 +12,7 @@ from numpy.random import randn
 from waypointShared import *
 
 from pdb import set_trace as DEBUG
-from autonomous import *
+from coordinateFrames import *
 
 
 MSG_TEMPLATE = {
@@ -101,7 +101,7 @@ class RobotSimInterface( object ):
 
 
 
-    self.autonomous = AutonomousPlanner()
+    self.coordinateFrames = CoordinateFrames()
     borderPoints = { tid : sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners}
     borderPointsReal = { 
       22: [2, 1],
@@ -112,7 +112,7 @@ class RobotSimInterface( object ):
       27: [2, 0],
       28: [0, 2],
       29: [2, 2]}
-    self.autonomous.calculateTransformation(borderPoints, borderPointsReal)
+    self.coordinateFrames.calculateTransformation(borderPoints, borderPointsReal)
 
     ### Initialize internal variables
     # Two points on the laser screen
@@ -169,7 +169,7 @@ class DummyRobotSim( RobotSimInterface ):
     self.wheelSideLength = 0.08; # meters
     self.wheelXNoise = 0.01
 
-    self.autoStep = false
+    self.autoStep = False
     
   def moveX( self, dist ):
     """
@@ -179,7 +179,7 @@ class DummyRobotSim( RobotSimInterface ):
     """
 
     distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
-    rotatedDist = self.autonomous.rotateRealToArbitrary(distMoved)
+    rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
     self.tagPos = self.tagPos + rotatedDist[newaxis, :]
 
 
@@ -190,7 +190,7 @@ class DummyRobotSim( RobotSimInterface ):
     must be an integer
     """
     distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
-    rotatedDist = self.autonomous.rotateRealToArbitrary(distMoved)
+    rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
     self.tagPos = self.tagPos + rotatedDist[newaxis, :]
     
   def refreshState( self ):
@@ -213,9 +213,11 @@ class DummyRobotSim( RobotSimInterface ):
     """
     #If operating step, check odometry
     if self.autoStep:
+      pass
       #check odo, if correct, stop motor
        
     #Otherwise, start operating next planned step
-    if !self.autoStep:
+    if not self.autoStep:
+      pass
       # from autonomous.py, what is next step direction?
       # motor command

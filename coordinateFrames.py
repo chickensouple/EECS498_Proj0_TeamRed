@@ -1,6 +1,6 @@
 from numpy import *
 
-class AutonomousPlanner:
+class CoordinateFrames:
 	def __init__(self):
 		pass
 		self.lineDist = 0
@@ -35,7 +35,6 @@ class AutonomousPlanner:
 
 		scale = average(sum(self.R**2, axis=0))
 		self.R_inverse = (1. / (scale)) * transpose(self.R)
-		print(dot(self.R, self.R_inverse))
 
 	def convertArbitraryToReal(self, sensorPt):
 		pt = array([sensorPt[0], sensorPt[1], 1])
@@ -55,3 +54,4 @@ class AutonomousPlanner:
 
 
 	def getNextStep( self, robSim, sensorData ):
+		pass
