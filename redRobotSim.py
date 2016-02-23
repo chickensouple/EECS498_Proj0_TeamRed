@@ -14,7 +14,6 @@ from waypointShared import *
 from pdb import set_trace as DEBUG
 from coordinateFrames import *
 
-
 MSG_TEMPLATE = {
        0: [[502, 251], [479, 272], [508, 296], [530, 274]],
        1: [[469, 347], [471, 311], [434, 305], [431, 339]],
@@ -102,17 +101,9 @@ class RobotSimInterface( object ):
 
 
     self.coordinateFrames = CoordinateFrames()
-    borderPoints = { tid : sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners}
-    borderPointsReal = { 
-      22: [2, 1],
-      23: [1, 0],
-      24: [1, 2],
-      25: [0, 1],
-      26: [0, 0],
-      27: [2, 0],
-      28: [0, 2],
-      29: [2, 2]}
-    self.coordinateFrames.calculateTransformation(borderPoints, borderPointsReal)
+    borderPoints = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
+    borderPoints = concatenate((borderPoints, [[1]]*8), axis=1)
+    self.coordinateFrames.calculateTransformation(borderPoints, ref)
 
     ### Initialize internal variables
     # Two points on the laser screen
@@ -166,7 +157,8 @@ class DummyRobotSim( RobotSimInterface ):
     self.aNoise = 0.1
 
     self.wheelNumSides = 6;
-    self.wheelSideLength = 0.08; # meters
+    # self.wheelSideLength = 0.08; # meters
+    self.wheelSideLength = 8;
     self.wheelXNoise = 0.01
 
     self.autoStep = False
@@ -192,6 +184,13 @@ class DummyRobotSim( RobotSimInterface ):
     distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
     rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
     self.tagPos = self.tagPos + rotatedDist[newaxis, :]
+
+  def moveTo(self, loc):
+    centerTag = mean(self.tagPos, axis=0)
+    diff = self.tagPos - centerTag
+    newCenter = self.coordinateFrames.convertRealToArbitrary(loc)
+    self.tagPos = diff + newCenter
+    print(newCenter)
     
   def refreshState( self ):
     """
