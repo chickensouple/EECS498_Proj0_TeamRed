@@ -33,9 +33,10 @@ class Switch:
 
 	def getPos(self):
 		if (self.mode == Mode.SIMULATION):
-			return self.sim.getCurrPos()
+			return self.sim.getCurrPosCamera()
 
 
 	def inMotion(self):
-		return (clock() - self.lastTime < 1)
+		if (self.mode == Mode.SIMULATION):
+			return (clock() - self.lastTime < 1)
 

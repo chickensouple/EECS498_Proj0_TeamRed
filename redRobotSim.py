@@ -7,7 +7,7 @@ Created on Thu Sep  4 20:31:13 2014
 from gzip import open as opengz
 from json import dumps as json_dumps
 from numpy import asfarray, dot, c_, newaxis, mean, exp, sum, sqrt
-from numpy.linalg import svd
+from numpy.linalg import svd, inv
 from numpy.random import randn
 from waypointShared import *
 from joy import *
@@ -147,7 +147,6 @@ class RobotSimInterface( object ):
     
 class DummyRobotSim( RobotSimInterface ):
   def __init__(self, *args, **kw):
-    print(ref)
     RobotSimInterface.__init__(self, *args, **kw)
     self.dNoise = 0.1
     self.aNoise = 0.1
@@ -160,13 +159,13 @@ class DummyRobotSim( RobotSimInterface ):
     self.autoStep = False
 
     self.coordinateFrames = CoordinateFrames()
-    borderPoints = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
-    borderPoints = concatenate((borderPoints, [[1]]*8), axis=1)
-    self.coordinateFrames.calculateTransformation(borderPoints, ref)
+    cameraPts = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
+    cameraPts = concatenate((cameraPts, [[1]]*8), axis=1)
+    self.coordinateFrames.calculateTransformation(cameraPts, ref)
 
     self.autonomousPlanner = AutonomousPlanner(self, self.coordinateFrames)
 
-  def getCurrPos(self):
+  def getCurrPosCamera(self):
     return mean(self.tagPos, axis=0)
     
   def moveX( self, dist ):
@@ -176,9 +175,19 @@ class DummyRobotSim( RobotSimInterface ):
     must be an integer
     """
 
+    currPosCamera = self.getCurrPosCamera()
+    currPosReal = self.coordinateFrames.convertCameraToReal(self.getCurrPosCamera())
     distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
-    rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
-    self.tagPos = self.tagPos + rotatedDist[newaxis, :]
+    
+    diff = self.tagPos - currPosCamera
+    newCenterReal = currPosReal + distMoved
+    newCenterCamera = self.coordinateFrames.convertRealToCamera(newCenterReal)
+    self.tagPos = diff + newCenterCamera
+
+
+    # distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
+    # rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
+    # self.tagPos = self.tagPos + rotatedDist[newaxis, :]
 
   def moveY(self, dist):
     """
@@ -186,14 +195,19 @@ class DummyRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
+    currPosCamera = self.getCurrPosCamera()
+    currPosReal = self.coordinateFrames.convertCameraToReal(self.getCurrPosCamera())
     distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
-    rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
-    self.tagPos = self.tagPos + rotatedDist[newaxis, :]
+    
+    diff = self.tagPos - currPosCamera
+    newCenterReal = currPosReal + distMoved
+    newCenterCamera = self.coordinateFrames.convertRealToCamera(newCenterReal)
+    self.tagPos = diff + newCenterCamera
 
   def moveTo(self, loc):
     centerTag = mean(self.tagPos, axis=0)
     diff = self.tagPos - centerTag
-    newCenter = self.coordinateFrames.convertRealToArbitrary(loc)
+    newCenter = self.coordinateFrames.convertRealToCamera(loc)
     self.tagPos = diff + newCenter
     
   def refreshState( self ):

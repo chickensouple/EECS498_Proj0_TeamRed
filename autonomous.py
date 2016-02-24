@@ -36,11 +36,11 @@ class AutonomousPlanner:
   	tempWaypoint = copy(waypoints[1])
   	tempWaypoint[0] = -tempWaypoint[0]
 
-  	currPos = self.coordinateFrames.convertArbitraryToReal(self.switch.getPos())
+  	currPos = self.coordinateFrames.convertCameraToReal(self.switch.getPos())
   	directionVec = tempWaypoint - currPos
-  	print("Target Waypoint: " + str(waypoints[1]))
-  	print("Current Pos: " + str(currPos))
-  	print("DirectionVec: " + str(directionVec))
+  	# print("Target Waypoint: " + str(waypoints[1]))
+  	# print("Current Pos: " + str(currPos))
+  	# print("DirectionVec: " + str(directionVec))
 
   	directionDot = dict()
   	for direction, vec in self.directions.iteritems():
