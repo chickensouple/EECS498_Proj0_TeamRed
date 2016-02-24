@@ -95,8 +95,10 @@ class CoordinateFrames:
 		return array([rotated[0], rotated[1]])
 
 	def rotateArbitraryToReal(self, sensorPt):
-		return dot(self.R, sensorPt)
+		rotated = dot(self.R, sensorPt)
+		return rotated
 
 	def rotateRealToArbitrary(self, realPt):
+		rotated = dot(self.R, realPt)
 		return dot(self.R_inverse, realPt)
 

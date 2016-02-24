@@ -147,6 +147,7 @@ class RobotSimInterface( object ):
     
 class DummyRobotSim( RobotSimInterface ):
   def __init__(self, *args, **kw):
+    print(ref)
     RobotSimInterface.__init__(self, *args, **kw)
     self.dNoise = 0.1
     self.aNoise = 0.1

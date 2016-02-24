@@ -21,12 +21,23 @@ class AutonomousPlanner:
     #Run filter computation, update d,r in robSim
     
   def plan(self, waypoints):
+  	"""
+  		plans the next step of the robot
+  		waypoints are in real coordinates
+  	"""
+
   	if (self.switch.inMotion()):
   		return
   	if (len(waypoints) <= 1):
   		return
 
-  	directionVec = self.coordinateFrames.rotateArbitraryToReal(waypoints[1] - self.switch.getPos())
+  	tempWaypoint = copy(waypoints[1])
+  	tempWaypoint[0] = -tempWaypoint[0]
+
+  	currPos = self.coordinateFrames.convertArbitraryToReal(self.switch.getPos())
+  	directionVec = tempWaypoint - currPos
+  	print("Target Waypoint: " + str(waypoints[1]))
+  	print("Current Pos: " + str(currPos))
   	print("DirectionVec: " + str(directionVec))
 
   	directionDot = dict()
