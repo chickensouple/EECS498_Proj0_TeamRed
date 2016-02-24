@@ -53,5 +53,3 @@ class CoordinateFrames:
 		return dot(self.R_inverse, realPt)
 
 
-	def getNextStep( self, robSim, sensorData ):
-		pass

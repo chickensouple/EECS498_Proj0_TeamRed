@@ -10,9 +10,11 @@ from numpy import asfarray, dot, c_, newaxis, mean, exp, sum, sqrt
 from numpy.linalg import svd
 from numpy.random import randn
 from waypointShared import *
+from joy import *
 
 from pdb import set_trace as DEBUG
 from coordinateFrames import *
+from AutonomousPlanner import *
 
 
 MSG_TEMPLATE = {
@@ -170,6 +172,7 @@ class DummyRobotSim( RobotSimInterface ):
     self.wheelXNoise = 0.01
 
     self.autoStep = False
+    self.autonomousPlanner = AutonomousPlanner( self )
     
   def moveX( self, dist ):
     """
