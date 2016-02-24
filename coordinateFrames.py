@@ -52,9 +52,6 @@ class CoordinateFrames:
 		self.lineDev = 0
 
 	def calculateTransformation(self, sensorPts, realPts):
-		# self.T = fitHomography(sensorPts, realPts)
-		# self.T_inverse = inv(self.T)
-
 		size = len(sensorPts)
 
 		y = zeros(size * 2)

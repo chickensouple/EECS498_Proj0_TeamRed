@@ -1,15 +1,50 @@
 from numpy import *
-from CoordinateFrames import *
+from coordinateFrames import *
+from switch import *
+from directions import *
+import operator
 
 class AutonomousPlanner:
-  def __init__( self, robSim ) 
+  def __init__(self, robSim, coordinateFrames): 
     #Get reference to the simgle robSim instance
-    self.robSim = robSim
+    # self.robSim = robSim
+    self.switch = Switch(robSim)
+    self.coordinateFrames = coordinateFrames;
+    self.directions = dict()
+    self.directions[Directions.PosX] = array([1, 0])
+    self.directions[Directions.NegX] = array([-1, 0])
+    self.directions[Directions.PosY] = array([0, 1])
+    self.directions[Directions.NegY] = array([0, -1])
 
-  def update ( self )
+  def updateFilter (self):
+  	pass
     #Run filter computation, update d,r in robSim
     
-  def stepDir ( self ) 
-    #Dot product of X,Y component vectors wrt interwaypoint line
-    #return X or Y depending on which dot product is greater
+  def plan(self, waypoints):
+  	if (self.switch.inMotion()):
+  		return
+  	if (len(waypoints) <= 1):
+  		return
+
+  	directionVec = self.coordinateFrames.rotateArbitraryToReal(waypoints[1] - self.switch.getPos())
+  	print("DirectionVec: " + str(directionVec))
+
+  	directionDot = dict()
+  	for direction, vec in self.directions.iteritems():
+  		directionDot[direction] = dot(vec, directionVec)
+
+  	# gets the direction with the largest dot product
+  	direction = max(directionDot.iteritems(), key=operator.itemgetter(1))[0]
+  	print Directions.Names[direction]
+  	self.move(direction)
+
+  def move(self, direction):
+  	if (direction == Directions.PosX):
+  		self.switch.movePosX()
+  	elif (direction == Directions.NegX):
+  		self.switch.moveNegX()
+  	elif (direction == Directions.PosY):
+  		self.switch.movePosY()
+  	elif (direction == Directions.NegY):
+  		self.switch.moveNegY()
 

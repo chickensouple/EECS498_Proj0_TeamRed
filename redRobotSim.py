@@ -14,7 +14,7 @@ from joy import *
 
 from pdb import set_trace as DEBUG
 from coordinateFrames import *
-from AutonomousPlanner import *
+from autonomous import *
 
 MSG_TEMPLATE = {
        0: [[502, 251], [479, 272], [508, 296], [530, 274]],
@@ -100,13 +100,6 @@ class RobotSimInterface( object ):
     self.laserAxis = dot([[1,1,0,0],[0,0,1,1]],self.tagPos)/2
     self.waypoints = { tid : asfarray(MSG_TEMPLATE[tid]) for tid in waypoints }
 
-
-
-    self.coordinateFrames = CoordinateFrames()
-    borderPoints = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
-    borderPoints = concatenate((borderPoints, [[1]]*8), axis=1)
-    self.coordinateFrames.calculateTransformation(borderPoints, ref)
-
     ### Initialize internal variables
     # Two points on the laser screen
     self.laserScreen = asfarray([[-1,-1],[1,-1]])
@@ -164,7 +157,16 @@ class DummyRobotSim( RobotSimInterface ):
     self.wheelXNoise = 0.01
 
     self.autoStep = False
-    self.autonomousPlanner = AutonomousPlanner( self )
+
+    self.coordinateFrames = CoordinateFrames()
+    borderPoints = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
+    borderPoints = concatenate((borderPoints, [[1]]*8), axis=1)
+    self.coordinateFrames.calculateTransformation(borderPoints, ref)
+
+    self.autonomousPlanner = AutonomousPlanner(self, self.coordinateFrames)
+
+  def getCurrPos(self):
+    return mean(self.tagPos, axis=0)
     
   def moveX( self, dist ):
     """
@@ -176,7 +178,6 @@ class DummyRobotSim( RobotSimInterface ):
     distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
     rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
     self.tagPos = self.tagPos + rotatedDist[newaxis, :]
-
 
   def moveY(self, dist):
     """
@@ -193,7 +194,6 @@ class DummyRobotSim( RobotSimInterface ):
     diff = self.tagPos - centerTag
     newCenter = self.coordinateFrames.convertRealToArbitrary(loc)
     self.tagPos = diff + newCenter
-    print(newCenter)
     
   def refreshState( self ):
     """
@@ -208,18 +208,18 @@ class DummyRobotSim( RobotSimInterface ):
     self.laserAxis[1] += randn(2) * sqrt(sum(da*da)) * 0.01
     
 
-  def autoTask( self ):
-    """
-    Operate next step in autonomous plan
-    Should update every (1/20.0) seconds, based on self.timeForAuto in simTagStreamer
-    """
-    #If operating step, check odometry
-    if self.autoStep:
-      pass
-      #check odo, if correct, stop motor
+  # def autoTask( self ):
+  #   """
+  #   Operate next step in autonomous plan
+  #   Should update every (1/20.0) seconds, based on self.timeForAuto in simTagStreamer
+  #   """
+  #   #If operating step, check odometry
+  #   if self.autoStep:
+  #     pass
+  #     #check odo, if correct, stop motor
        
-    #Otherwise, start operating next planned step
-    if not self.autoStep:
-      pass
-      # from autonomous.py, what is next step direction?
-      # motor command
+  #   #Otherwise, start operating next planned step
+  #   if not self.autoStep:
+  #     pass
+  #     # from autonomous.py, what is next step direction?
+  #     # motor command
