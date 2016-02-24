@@ -29,7 +29,6 @@ def skew( v ):
 		[v[2,...], z, -v[0,...] ],
 		[-v[1,...], v[0,...], z ] ]).T
 
-
 def fitHomography(x, y ):
 	"""Fit a homography mapping points x to points y"""
 	x = asarray(x)
@@ -49,7 +48,6 @@ def applyHomography(H, x):
 	y = y / y[2]
 	return y
 
-
 class CoordinateFrames:
 	def __init__(self):
 		pass
@@ -60,39 +58,6 @@ class CoordinateFrames:
 		# T turns cameraPts into realPts
 		self.T = fitHomography(cameraPts, realPts)
 		self.T_inverse = inv(self.T)
-
-
-		# size = len(sensorPts)
-
-		# y = zeros(size * 2)
-		# H = zeros([size * 2, 6])
-		# count = 0
-		# # for key, sensorPt in sensorPts.iteritems():
-		# for (sensorPt, realPt) in zip(sensorPts, realPts):
-		# 	# realPt = realPts[key]
-
-		# 	y[2 * count] = realPt[0]
-		# 	y[(2 * count) + 1] = realPt[1]
-			
-		# 	H[2*count,0] = sensorPt[0]
-		# 	H[2*count,1] = sensorPt[1]
-		# 	H[2*count,2] = 1
-		# 	H[(2*count)+1,3] = sensorPt[0]
-		# 	H[(2*count)+1,4] = sensorPt[1]
-		# 	H[(2*count)+1,5] = 1
-		# 	count += 1
-
-		# coeffs = linalg.lstsq(H, transpose(y))[0]
-		# self.T = array([[coeffs[0], coeffs[1], coeffs[2]],
-		# 	[coeffs[3], coeffs[4], coeffs[5]],
-		# 	[0, 0, 1]])
-		# self.T_inverse = linalg.inv(self.T)
-		# self.R = array([[coeffs[0], coeffs[1]],
-		# 	[coeffs[3], coeffs[4]]])
-
-		# scale = average(sum(self.R**2, axis=0))
-		# self.R_inverse = (1. / (scale)) * transpose(self.R)
-
 
 	def convertCameraToReal(self, arbitraryPt):
 		pt = array([arbitraryPt[0], arbitraryPt[1], 1])

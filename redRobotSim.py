@@ -184,11 +184,6 @@ class DummyRobotSim( RobotSimInterface ):
     newCenterCamera = self.coordinateFrames.convertRealToCamera(newCenterReal)
     self.tagPos = diff + newCenterCamera
 
-
-    # distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
-    # rotatedDist = self.coordinateFrames.rotateRealToArbitrary(distMoved)
-    # self.tagPos = self.tagPos + rotatedDist[newaxis, :]
-
   def moveY(self, dist):
     """
     Move forward some distance in the Y direction
