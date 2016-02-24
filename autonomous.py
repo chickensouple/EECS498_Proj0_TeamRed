@@ -31,13 +31,8 @@ class AutonomousPlanner:
   	if (len(waypoints) <= 1):
   		return
 
-  	# it seems that the waypoint x's are negative of what
-  	# they are supposed to be
-  	tempWaypoint = copy(waypoints[1])
-  	tempWaypoint[0] = -tempWaypoint[0]
-
   	currPos = self.coordinateFrames.convertCameraToReal(self.switch.getPos())
-  	directionVec = tempWaypoint - currPos
+  	directionVec = waypoints[1] - currPos
   	# print("Target Waypoint: " + str(waypoints[1]))
   	# print("Current Pos: " + str(currPos))
   	# print("DirectionVec: " + str(directionVec))
