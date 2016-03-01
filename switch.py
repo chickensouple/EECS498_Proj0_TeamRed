@@ -38,7 +38,6 @@ class Switch:
 		if (self.mode == Mode.SIMULATION):
 			return self.sim.pos
 
-
 	def inMotion(self):
 		if (self.mode == Mode.SIMULATION):
 			return (clock() - self.lastTime < 1)

@@ -15,6 +15,8 @@ from joy import *
 from pdb import set_trace as DEBUG
 from coordinateFrames import *
 from autonomous import *
+from particleFilter import *
+from constants import *
 
 MSG_TEMPLATE = {
        0: [[502, 251], [479, 272], [508, 296], [530, 274]],
@@ -150,8 +152,8 @@ class DummyRobotSim( RobotSimInterface ):
     RobotSimInterface.__init__(self, *args, **kw)
 
     # robot constants
-    self.wheelNumSides = 6;
-    self.wheelSideLength = 8; # cm
+    self.wheelNumSides = wheelNumSides;
+    self.wheelSideLength = wheelSideLength; # cm
 
     # robot simulation constants
     self.wheelXNoise = 0.1 # cm
@@ -194,6 +196,9 @@ class DummyRobotSim( RobotSimInterface ):
     realTagPos = tagDiffs + self.pos
     for i in range(len(realTagPos)):
       self.tagPos[i] = self.coordinateFrames.convertRealToCamera(realTagPos[i])
+
+  def getCurrPosCamera(self):
+    return mean(self.tagPos, axis=0)
     
   def moveX( self, dist ):
     """
