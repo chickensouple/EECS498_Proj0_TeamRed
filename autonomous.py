@@ -31,7 +31,7 @@ class AutonomousPlanner:
   	if (len(waypoints) <= 1):
   		return
 
-  	currPos = self.coordinateFrames.convertCameraToReal(self.switch.getPos())
+  	currPos = array(self.switch.getPos())
   	directionVec = waypoints[1] - currPos
   	# print("Target Waypoint: " + str(waypoints[1]))
   	# print("Current Pos: " + str(currPos))

@@ -32,8 +32,11 @@ class Switch:
 			self.lastTime = clock()
 
 	def getPos(self):
+		"""
+		Gets position in real coordinates
+		"""
 		if (self.mode == Mode.SIMULATION):
-			return self.sim.getCurrPosCamera()
+			return self.sim.pos
 
 
 	def inMotion(self):

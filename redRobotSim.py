@@ -148,16 +148,26 @@ class RobotSimInterface( object ):
 class DummyRobotSim( RobotSimInterface ):
   def __init__(self, *args, **kw):
     RobotSimInterface.__init__(self, *args, **kw)
-    self.dNoise = 0.1
-    self.aNoise = 0.1
 
+    # robot constants
     self.wheelNumSides = 6;
-    # self.wheelSideLength = 0.08; # meters
-    self.wheelSideLength = 8;
-    self.wheelXNoise = 0.01
+    self.wheelSideLength = 8; # cm
 
-    self.autoStep = False
+    # robot simulation constants
+    self.wheelXNoise = 0.1 # cm
+    self.wheelYNoise = 0.1 # cm
+    self.yawNoise = 0.002 # radians
+    self.xYawBias = 0.001 # radians
+    self.yYawBias = -0.001 # radians
 
+    # environment constants
+    self.tagLength = 20; # cm
+
+    # state
+    self.pos = [0, 0]; # cm (x, y)
+    self.yaw = 0; # radians
+    
+    # initializing coordinate frames
     self.coordinateFrames = CoordinateFrames()
     cameraPts = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
     cameraPts = concatenate((cameraPts, [[1]]*8), axis=1)
@@ -165,8 +175,25 @@ class DummyRobotSim( RobotSimInterface ):
 
     self.autonomousPlanner = AutonomousPlanner(self, self.coordinateFrames)
 
-  def getCurrPosCamera(self):
-    return mean(self.tagPos, axis=0)
+    self.drawRobotCorners()
+
+  def drawRobotCorners(self):
+    """
+    Redraws the corners of the tag based on 
+    self.pos, self.yaw
+    and self.tagLength
+    """
+    L = self.tagLength
+    borderPts = [[L/2, L/2],
+      [L/2, -L/2],
+      [-L/2, -L/2],
+      [-L/2, L/2]]
+    tagDiffs = zeros([4, 2])
+    for i in range(len(tagDiffs)):
+      tagDiffs[i] = CoordinateFrames.rotateCCW(borderPts[i], self.yaw)
+    realTagPos = tagDiffs + self.pos
+    for i in range(len(realTagPos)):
+      self.tagPos[i] = self.coordinateFrames.convertRealToCamera(realTagPos[i])
     
   def moveX( self, dist ):
     """
@@ -174,15 +201,9 @@ class DummyRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
-
-    currPosCamera = self.getCurrPosCamera()
-    currPosReal = self.coordinateFrames.convertCameraToReal(self.getCurrPosCamera())
-    distMoved = array([(int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise), 0.])
-    
-    diff = self.tagPos - currPosCamera
-    newCenterReal = currPosReal + distMoved
-    newCenterCamera = self.coordinateFrames.convertRealToCamera(newCenterReal)
-    self.tagPos = diff + newCenterCamera
+    self.pos[0] += (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)
+    self.yaw += (randn() * self.yawNoise) + self.xYawBias
+    self.drawRobotCorners()
 
   def moveY(self, dist):
     """
@@ -190,20 +211,13 @@ class DummyRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
-    currPosCamera = self.getCurrPosCamera()
-    currPosReal = self.coordinateFrames.convertCameraToReal(self.getCurrPosCamera())
-    distMoved = array([0., (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)])
-    
-    diff = self.tagPos - currPosCamera
-    newCenterReal = currPosReal + distMoved
-    newCenterCamera = self.coordinateFrames.convertRealToCamera(newCenterReal)
-    self.tagPos = diff + newCenterCamera
+    self.pos[1] += (int(dist) * self.wheelSideLength) + (randn() * self.wheelYNoise)
+    self.yaw += (randn() * self.yawNoise) + self.yYawBias
+    self.drawRobotCorners()
 
   def moveTo(self, loc):
-    centerTag = mean(self.tagPos, axis=0)
-    diff = self.tagPos - centerTag
-    newCenter = self.coordinateFrames.convertRealToCamera(loc)
-    self.tagPos = diff + newCenter
+    self.pos = loc
+    self.drawRobotCorners()
     
   def refreshState( self ):
     """
@@ -217,19 +231,3 @@ class DummyRobotSim( RobotSimInterface ):
     da = dot([1,-1],self.laserAxis)
     self.laserAxis[1] += randn(2) * sqrt(sum(da*da)) * 0.01
     
-
-  # def autoTask( self ):
-  #   """
-  #   Operate next step in autonomous plan
-  #   Should update every (1/20.0) seconds, based on self.timeForAuto in simTagStreamer
-  #   """
-  #   #If operating step, check odometry
-  #   if self.autoStep:
-  #     pass
-  #     #check odo, if correct, stop motor
-       
-  #   #Otherwise, start operating next planned step
-  #   if not self.autoStep:
-  #     pass
-  #     # from autonomous.py, what is next step direction?
-  #     # motor command
