@@ -58,18 +58,10 @@ def lineToPtDist(linePt1, linePt2, pt):
 	# distance = ----------------------------------------
 	#                     | (linePt2 - linePt1) |
 
-
-	# lineDeltaX = linePt2[0] - linePt1[0]
-	# lineDeltaY = linePt2[1] - linePt1[1]
-
-	# num = abs(lineDeltaX * (linePt1[1] - pt[1]) -
-	# 	lineDeltaY * (linePt[0] - pt[0]))
-	# den = sqrt(lineDeltaX * lineDeltaX + lineDeltaY * lineDeltaY)
-
-	# return num / den
-
+	linePt1 = array(linePt1)
+	linePt2 = array(linePt2)
+	pt = array(pt)
 	num = linalg.norm(cross(linePt2 - linePt1, linePt1 - pt))
 	den = linalg.norm(linePt2 - linePt1)
 	return num / den
-
 

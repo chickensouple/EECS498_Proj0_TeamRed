@@ -143,10 +143,10 @@ class RobotSimInterface( object ):
     """
     x = findXing( self.laserScreen, self.laserAxis )
     if self.out:
-      self.out.write("%.2f, 1, %d, %d\n" % (now,n+1,x[0],x[1]))          
+      self.out.write("%.2f, 1, %d, %d\n" % (now,n+1,x[0],x[1]))
     return "Laser: %d,%d " % tuple(x)
-    
-    
+
+
 class DummyRobotSim( RobotSimInterface ):
   def __init__(self, *args, **kw):
     RobotSimInterface.__init__(self, *args, **kw)
@@ -196,10 +196,9 @@ class DummyRobotSim( RobotSimInterface ):
     realTagPos = tagDiffs + self.pos
     for i in range(len(realTagPos)):
       self.tagPos[i] = self.coordinateFrames.convertRealToCamera(realTagPos[i])
+  
+  # def getSensorLocations(self):
 
-  def getCurrPosCamera(self):
-    return mean(self.tagPos, axis=0)
-    
   def moveX( self, dist ):
     """
     Move forward some distance in the X direction

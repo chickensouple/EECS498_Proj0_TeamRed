@@ -1,7 +1,7 @@
 from directions import *
 from state import *
 from constants import *
-from numpy.random import randn
+from numpy.random import randn, uniform
 from numpy import *
 from numpy.linalg import *
 from coordinateFrames import *
@@ -18,7 +18,7 @@ class ParticleFilter:
 		self.yNoise = 0.1 # cm
 		self.xYawBias = 0.001 # radians
 		self.yYawBias = 0.001 # radians
-		self.yawBias = 0.002 # radians
+		self.yawNoise = 0.002 # radians
 
 		self.tagLength = tagLength
 
@@ -28,11 +28,20 @@ class ParticleFilter:
 		self.particles = []
 		self.wheelSideLength = wheelSideLength;
 
-		probability = 1 / self.numTotalParticles
+		self.equalProbability = 1 / self.numTotalParticles
 		for i in range(self.numTotalParticles):
 			initialPos = [0, 0]
 			initialYaw = 0
-			self.particles.append(Particle(initialPos, initialYaw, probability))
+			self.particles.append(Particle(initialPos, initialYaw, self.equalProbability))
+
+		self.mostProbable = self.particles[0]
+
+
+	def setLoc(self, pos, yaw):
+		for particle in self.particles:
+			particle.prob = self.equalProbability
+			particle.state.pos = pos
+			particle.state.yaw = yaw
 
 	def update(self, direction):
 		# move each particle with noise
@@ -49,7 +58,7 @@ class ParticleFilter:
 			elif (direction == Directions.NegY):
 				particle.state.pos[1] -= self.wheelSideLength + randn() * self.yNoise
 				particle.state.yaw -= self.yYawBias
-			particle.state.yaw += randn() * self.yawBias
+			particle.state.yaw += randn() * self.yawNoise
 
 	def correct(self, sensor, waypoints):
 		"""
@@ -58,10 +67,12 @@ class ParticleFilter:
 		"""
 		waypointLine = waypoints[1] - waypoints[0]
 
-		sensorReal = self.convertSensor(sensor, waypoints)
+		sensorReal = ParticleFilter.convertSensor(sensor)
 		sensorFrontDist = lineToPtDist(waypoints[1], waypoints[0], sensorReal[0])
 		sensorBackDist = lineToPtDist(waypoints[1], waypoints[0], sensorReal[1])
 
+		# updating each particle's probability with sensor model
+		totalProb = 0
 		for particle in self.particles:
 			rotatedLength = coordinateFrames.rotateCCW([self.tagLength/2, 0], -particle.state.yaw)
 			frontLoc = particle.state.pos + rotatedLength
@@ -72,24 +83,59 @@ class ParticleFilter:
 			sensorModel(particle, 
 				array([sensorFrontDist, sensorBackDist]),
 				array([frontDist, backDist]))
+			totalProb += particle.prob
+
+		# normalizing particle probabilities so they add to 1
+		scalar = 1.0 / totalProb
+		for particle in self.particles:
+			particle.prob *= scalar
+
+		# sort particles so greatest probabilities are at lower indices
+		# this step is so the drawing new random samples will be faster
+		self.particles.sort(key=lambda x: x.prob, reverse=True)
+
+		self.mostProbable = self.particles[0]
+		
+		newParticles = []
+
+		# draw new random samples
+		for i in range(self.numChosenParticles):
+			randNum = uniform()
+
+			cumulativeProb = 0
+			drewParticle = False
+			for particle in self.particles:
+				cumulativeProb += particle.prob
+				if (cumulativeProb > randNum):
+					newParticle = Particle(particle.pos, particle.yaw, self.equalProbability)
+					newParticles.append(newParticle)
+					drewParticle = True
+					break
+			if (not drewParticle):
+				newParticles.append(self.mostProbable)
 
 
+		# draw scattering of particles around most probable
+		for i in range(self.numRandomParticles):
+			randPos = randn(2) * 1.5
+			randYaw = randn() * 0.1
 
-		# update each particles probability
-		# normalize()
-		# drawRandomSamples()
-		pass
+			newParticle = Particle(self.mostProbable.state.pos + randPos,
+				self.mostProbable.state.yaw + randYaw, 
+				self.equalProbability)
+			newParticles.append(newParticle)
 
+		self.particles = newParticles
 
 	@staticmethod
 	def sensorModel(particle, sensorDists, particleDists):
 		# distsDiff measures how close the sensor values are
 		# to what the distance of this particle to the line
 		distsDiff = norm(sensorDists - particleDists)
-		scalar = 0.1
+		scalar = 0.2231
 
 		# the probability we multiply our particle prob by,
-		# p = p(sensor value | particle location) will be
+		# p = P(sensor value | particle location), will be
 		# e^(-distsDiff * scalar)
 		# so that when distsDiff is 0, p=1
 		# and for distsDiff > 0, p < 1 and drops off rapidly
@@ -97,11 +143,16 @@ class ParticleFilter:
 		sensorProb = exp(-distsDiff * scalar)
 		particle.prob *= sensorProb
 
-
-
 	def getPosition(self):
 		pass
 
-	def convertSensor(self, sensor, waypoints):
-		return sensor
+	@staticmethod
+	def convertSensor(sensor):
+		# converts sensor values into real distances
+		# model for sensor is
+		# y: real dist
+		# x: sensor dist
+		# y = 0.0007762568 * x^2 - 0.4104391031*x + 55.0759770855
+		return 0.0007762568 * sensor * sensor - \
+			0.4104391031 * sensor + 55.0759770855
 
