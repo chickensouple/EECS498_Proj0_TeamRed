@@ -163,7 +163,7 @@ class DummyRobotSim( RobotSimInterface ):
     self.yYawBias = -0.001 # radians
 
     # environment constants
-    self.tagLength = 20; # cm
+    self.tagLength = tagLength; # cm
 
     # state
     self.pos = [0, 0]; # cm (x, y)
