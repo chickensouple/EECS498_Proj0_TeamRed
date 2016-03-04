@@ -5,6 +5,7 @@ from numpy.random import randn, uniform
 from numpy import *
 from numpy.linalg import *
 from coordinateFrames import *
+import pdb
 
 class Particle:
 	def __init__(self, pos=[0, 0], yaw=0, prob = 0):
@@ -28,7 +29,7 @@ class ParticleFilter:
 		self.particles = []
 		self.wheelSideLength = wheelSideLength;
 
-		self.equalProbability = 1 / self.numTotalParticles
+		self.equalProbability = 1.0 / self.numTotalParticles
 		for i in range(self.numTotalParticles):
 			initialPos = [0, 0]
 			initialYaw = 0
@@ -37,11 +38,14 @@ class ParticleFilter:
 		self.mostProbable = self.particles[0]
 
 
-	def setLoc(self, pos, yaw):
+	def setState(self, pos, yaw):
 		for particle in self.particles:
+			randPos = randn(2) * 1.5
+			randYaw = randn() * 0.1
+
 			particle.prob = self.equalProbability
-			particle.state.pos = pos
-			particle.state.yaw = yaw
+			particle.state.pos = pos + randPos
+			particle.state.yaw = yaw + randYaw
 
 	def update(self, direction):
 		# move each particle with noise
@@ -65,22 +69,23 @@ class ParticleFilter:
 		sensor is a list of front and back sensors [f, b] still in raw sensor form
 		waypoints is list of waypoints in real coordinates
 		"""
-		waypointLine = waypoints[1] - waypoints[0]
+		waypoint0 = array(waypoints[0])
+		waypoint1 = array(waypoints[1])
 
 		sensorReal = ParticleFilter.convertSensor(sensor)
-		sensorFrontDist = lineToPtDist(waypoints[1], waypoints[0], sensorReal[0])
-		sensorBackDist = lineToPtDist(waypoints[1], waypoints[0], sensorReal[1])
+		sensorFrontDist = lineToPtDist(waypoint1, waypoint0, sensorReal[0])
+		sensorBackDist = lineToPtDist(waypoint1, waypoint0, sensorReal[1])
 
 		# updating each particle's probability with sensor model
 		totalProb = 0
 		for particle in self.particles:
-			rotatedLength = coordinateFrames.rotateCCW([self.tagLength/2, 0], -particle.state.yaw)
+			rotatedLength = CoordinateFrames.rotateCCW([self.tagLength/2, 0], -particle.state.yaw)
 			frontLoc = particle.state.pos + rotatedLength
 			backLoc = particle.state.pos - rotatedLength
 
-			frontDist = lineToPtDist(waypoints[1], waypoints[0], frontLoc)
-			backDist = lineToPtDist(waypoints[1], waypoints[0], backLoc)
-			sensorModel(particle, 
+			frontDist = lineToPtDist(waypoint1, waypoint0, frontLoc)
+			backDist = lineToPtDist(waypoint1, waypoint0, backLoc)
+			ParticleFilter.sensorModel(particle, 
 				array([sensorFrontDist, sensorBackDist]),
 				array([frontDist, backDist]))
 			totalProb += particle.prob
@@ -95,7 +100,7 @@ class ParticleFilter:
 		self.particles.sort(key=lambda x: x.prob, reverse=True)
 
 		self.mostProbable = self.particles[0]
-		
+
 		newParticles = []
 
 		# draw new random samples
@@ -107,7 +112,7 @@ class ParticleFilter:
 			for particle in self.particles:
 				cumulativeProb += particle.prob
 				if (cumulativeProb > randNum):
-					newParticle = Particle(particle.pos, particle.yaw, self.equalProbability)
+					newParticle = Particle(particle.state.pos, particle.state.yaw, self.equalProbability)
 					newParticles.append(newParticle)
 					drewParticle = True
 					break
@@ -127,6 +132,7 @@ class ParticleFilter:
 
 		self.particles = newParticles
 
+
 	@staticmethod
 	def sensorModel(particle, sensorDists, particleDists):
 		# distsDiff measures how close the sensor values are
@@ -143,8 +149,8 @@ class ParticleFilter:
 		sensorProb = exp(-distsDiff * scalar)
 		particle.prob *= sensorProb
 
-	def getPosition(self):
-		pass
+	def getState(self):
+		return self.mostProbable.state
 
 	@staticmethod
 	def convertSensor(sensor):
