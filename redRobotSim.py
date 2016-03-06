@@ -168,6 +168,7 @@ class DummyRobotSim( RobotSimInterface ):
     # state
     self.pos = [0, 0]; # cm (x, y)
     self.yaw = 0; # radians
+
     
     # initializing coordinate frames
     self.coordinateFrames = CoordinateFrames()
@@ -175,7 +176,7 @@ class DummyRobotSim( RobotSimInterface ):
     cameraPts = concatenate((cameraPts, [[1]]*8), axis=1)
     self.coordinateFrames.calculateTransformation(cameraPts, ref)
 
-    self.autonomousPlanner = AutonomousPlanner(self, self.coordinateFrames)
+    self.autonomousPlanner = AutonomousPlanner(self, None, self.coordinateFrames)
 
     self.drawRobotCorners()
 

@@ -76,6 +76,13 @@ class ParticleFilter:
 		sensorFrontDist = lineToPtDist(waypoint1, waypoint0, sensorReal[0])
 		sensorBackDist = lineToPtDist(waypoint1, waypoint0, sensorReal[1])
 
+		# check to see if sensor is probably outside of line segment
+		if (abs(sensor[0] - sensor[1]) > 150):
+			if (sensor[0] == 0):
+				sensorFrontDist = -1
+			elif (sensor[1] == 0):
+				sensorBackDist = -1
+
 		# updating each particle's probability with sensor model
 		totalProb = 0
 		for particle in self.particles:

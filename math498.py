@@ -65,3 +65,16 @@ def lineToPtDist(linePt1, linePt2, pt):
 	den = linalg.norm(linePt2 - linePt1)
 	return num / den
 
+
+def wrapNum(num, minNum, maxNum):
+	while (num > maxNum):
+		num -= (maxNum - minNum)
+	while (num < minNum):
+		num += (maxNum - minNum)
+	return num
+
+def wrappedAngleDiff(angle1, angle2, wrappedLim):
+	wrappedLim = abs(wrappedLim)
+	return wrappedLim - abs(abs(angle1 - angle2) - wrappedLim)
+
+

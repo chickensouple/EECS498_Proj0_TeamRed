@@ -3,12 +3,13 @@ from coordinateFrames import *
 from switch import *
 from directions import *
 import operator
+from mode import *
 
 class AutonomousPlanner:
-  def __init__(self, robSim, coordinateFrames): 
-    #Get reference to the simgle robSim instance
+  def __init__(self, robSim, actual, coordinateFrames): 
+    #Get reference to the single robSim instance
     # self.robSim = robSim
-    self.switch = Switch(robSim)
+    self.switch = Switch(Mode.SIMULATION, robSim, actual)
     self.coordinateFrames = coordinateFrames;
     self.directions = dict()
     self.directions[Directions.PosX] = array([1, 0])

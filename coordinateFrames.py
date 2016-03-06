@@ -23,6 +23,11 @@ class CoordinateFrames:
 		newPt = applyHomography(self.T_inverse, pt)
 		return array([newPt[0], newPt[1]])
 
+
+	@staticmethod
+	def convertGridToWaypoint(self, pt, waypt1, waypt2):
+		pass
+
 	@staticmethod
 	def rotateCCW(pt, yaw):
 		"""
