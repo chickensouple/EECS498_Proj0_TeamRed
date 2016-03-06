@@ -1,45 +1,32 @@
 from joy import *
 from math498 import *
 
-class MovePosXPlan(Plan):
+class MotorPlan(Plan):
   def __init__(self, app, *arg, **kw):
     Plan.__init__(self, app, *arg, **kw)
+    self.motor = 0;
+    self.angle = 0.2
+
+  def setMotorNum(self, num):
+  	self.motor = num
+
+  def setAngleIncrement(self, angle):
+  	self.angle = angle
 
   def behavior(self):
-    self.app.motorX.unslack()
+    self.app.motors[self.motor].unslack()
 
-    currAng = self.app.motorX.get_ang()
-    targetAng = currAng + 0.2
-    self.app.motorX.set_ang(targetAng)
+    currAng = self.app.motors[self.motor].get_ang()
+    targetAng = currAng + self.angle
+    self.app.motors[self.motor].set_ang(targetAng)
 
     wrappedTargetAng = wrapNum(targetAng, -0.5, 0.5)
 
     threshold = 0.02
-    while (wrappedAngleDiff(wrappedTargetAng, self.app.motorX.get_ang(), 0.5) > threshold):
+    while (wrappedAngleDiff(wrappedTargetAng, self.app.motors[self.motor].get_ang(), 0.5) > threshold):
     	yield self.forDuration(0.05)
 
-    self.app.motorX.slack()
+    self.app.motors[self.motor].slack()
 
     yield
 
-
-class MoveNegXPlan(Plan):
-  def __init__(self, app, *arg, **kw):
-    Plan.__init__(self, app, *arg, **kw)
-
-  def behavior(self):
-    self.app.motorX.unslack()
-
-    currAng = self.app.motorX.get_ang()
-    targetAng = currAng - 0.2
-    self.app.motorX.set_ang(targetAng)
-
-    wrappedTargetAng = wrapNum(targetAng, -0.5, 0.5)
-
-    threshold = 0.02
-    while (wrappedAngleDiff(wrappedTargetAng, self.app.motorX.get_ang(), 0.5) > threshold):
-    	yield self.forDuration(0.05)
-
-    self.app.motorX.slack()
-
-    yield

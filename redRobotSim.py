@@ -148,7 +148,7 @@ class RobotSimInterface( object ):
 
 
 class DummyRobotSim( RobotSimInterface ):
-  def __init__(self, *args, **kw):
+  def __init__(self, particleFilter, *args, **kw):
     RobotSimInterface.__init__(self, *args, **kw)
 
     # robot constants
@@ -169,12 +169,13 @@ class DummyRobotSim( RobotSimInterface ):
     self.pos = [0, 0]; # cm (x, y)
     self.yaw = 0; # radians
 
-    
+    self.particleFilter = particleFilter
+
     # initializing coordinate frames
     self.coordinateFrames = CoordinateFrames()
     cameraPts = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
     cameraPts = concatenate((cameraPts, [[1]]*8), axis=1)
-    self.coordinateFrames.calculateTransformation(cameraPts, ref)
+    self.coordinateFrames.calculateRealToCameraTransformation(cameraPts, ref)
 
     self.autonomousPlanner = AutonomousPlanner(self, None, self.coordinateFrames)
 

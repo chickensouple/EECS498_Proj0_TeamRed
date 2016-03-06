@@ -1,5 +1,6 @@
 from numpy import *
 from numpy.linalg import lstsq, svd, inv, norm
+import pdb
 
 def skew( v ):
 	"""
@@ -77,4 +78,10 @@ def wrappedAngleDiff(angle1, angle2, wrappedLim):
 	wrappedLim = abs(wrappedLim)
 	return wrappedLim - abs(abs(angle1 - angle2) - wrappedLim)
 
+
+def floatClose(f1, f2, threshold = 1e-5):
+	"""
+	Returns true if f1 and f2 are close
+	"""
+	return abs(f1-f2) < threshold
 

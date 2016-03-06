@@ -8,7 +8,7 @@ class CoordinateFrames:
 		self.lineDist = 0
 		self.lineDev = 0
 
-	def calculateTransformation(self, cameraPts, realPts):
+	def calculateRealToCameraTransformation(self, cameraPts, realPts):
 		# T turns cameraPts into realPts
 		self.T = fitHomography(cameraPts, realPts)
 		self.T_inverse = inv(self.T)
@@ -23,10 +23,36 @@ class CoordinateFrames:
 		newPt = applyHomography(self.T_inverse, pt)
 		return array([newPt[0], newPt[1]])
 
+	def calculateRealToWaypointTransformation(self, waypoint1, waypoint2):
+		v1 = array(waypoint2) - array(waypoint1)
+		v1 = v1 / linalg.norm(v1)
 
-	@staticmethod
-	def convertGridToWaypoint(self, pt, waypt1, waypt2):
-		pass
+		v2 = array([0., 0.])
+
+		if floatClose(v1[0], 0):
+			v2[0] = 1
+			v2[1] = 0
+		elif floatClose(v1[1], 0):
+			v2[0] = 0
+			v2[1] = 1
+		else:
+			alpha = v1[1] / v1[0]
+			v2[1] = sqrt(1 / (1 + alpha**2))
+			v2[0] = v2[1] * -alpha
+
+		if cross(v1, v2) < 0:
+			v2 = -v2
+
+		self.realWaypoint = array([v1, v2])
+		self.waypoint = waypoint1
+
+	def convertRealToWaypoint(self, pt):
+		result = dot(self.realWaypoint, array(pt) - array(self.waypoint))
+		return result
+
+	def convertWaypointToReal(self, pt):
+		result = dot(self.realWaypoint.T, array(pt)) + self.waypoint
+
 
 	@staticmethod
 	def rotateCCW(pt, yaw):

@@ -14,48 +14,48 @@ class Switch:
 			self.sim.moveX(1)
 			self.lastTime = clock()
 		elif (self.mode == Mode.ACTUAL):
-			self.actual.movePosXPlan.start()
+			self.actual.motorPlan.setMotorNum(0)
+			self.actual.motorPlan.setAngleIncrement(0.2)
+			self.actual.motorPlan.start()
 
 	def moveNegX(self):
 		if (self.mode == Mode.SIMULATION):
 			self.sim.moveX(-1)
 			self.lastTime = clock()
 		elif (self.mode == Mode.ACTUAL):
-			self.actual.moveNegX.start()
+			self.actual.motorPlan.setMotorNum(0)
+			self.actual.motorPlan.setAngleIncrement(-0.2)
+			self.actual.motorPlan.start()
 
 	def movePosY(self):
 		if (self.mode == Mode.SIMULATION):
 			self.sim.moveY(1)
 			self.lastTime = clock()
 		elif (self.mode == Mode.ACTUAL):
-			# self.actual.movePosYPlan.start()
-			pass
+			self.actual.motorPlan.setMotorNum(1)
+			self.actual.motorPlan.setAngleIncrement(0.2)
+			self.actual.motorPlan.start()
 
 	def moveNegY(self):
 		if (self.mode == Mode.SIMULATION):
 			self.sim.moveY(-1)
 			self.lastTime = clock()
 		elif (self.mode == Mode.ACTUAL):
-			# self.actual.moveNegYPlan.start()
-			pass
+			self.actual.motorPlan.setMotorNum(1)
+			self.actual.motorPlan.setAngleIncrement(-0.2)
+			self.actual.motorPlan.start()
 
 	def getPos(self):
 		"""
 		Gets position in real coordinates
 		"""
 		if (self.mode == Mode.SIMULATION):
-			return self.sim.pos
+			return self.sim.particleFilter.getState().pos
 		elif (self.mode == Mode.ACTUAL):
-			return self.actual.particleFilter.getState()
+			return self.actual.particleFilter.getState().pos
 
 	def inMotion(self):
 		if (self.mode == Mode.SIMULATION):
 			return (clock() - self.lastTime < 1)
 		elif (self.mode == Mode.ACTUAL):
-			in_motion = False
-			in_motion = in_motion or self.actual.movePosXPlan.running()
-			in_motion = in_motion or self.actual.moveNegXPlan.running()
-			# in_motion = in_motion or self.actual.movePosYPlan.running()
-			# in_motion = in_motion or self.actual.moveNegYPlan.running()
-			return in_motion
-
+			return self.motorPlan.isRunning()

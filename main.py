@@ -11,7 +11,7 @@ from socket import (
   socket, AF_INET,SOCK_DGRAM, IPPROTO_UDP, error as SocketError,
   )
 
-numMotors = 1;
+numMotors = 2;
 cameraPts = [[ 115.632,  -84.96,     1.   ],
 	[ -10.064,  -84.96,     1.   ],
 	[-104.528,  -85.216,    1.   ],
@@ -39,16 +39,21 @@ class MainApp(JoyApp):
 
 	def onStart(self):
 		self.coordinateFrames = CoordinateFrames()
-		self.coordinateFrames.calculateTransformation(cameraPts, realPts)
+		self.coordinateFrames.calculateRealToCameraTransformation(cameraPts, realPts)
 
 		self.autonomousPlanner = AutonomousPlanner(None, self, self.coordinateFrames)
 
-		self.motorX = ServoWrapperMX(self, self.robot.at.Nx28)
-		# self.motorX = ServoWrapperMX(self, self.robot.at.H11)
-		self.motorX.start()
-		self.movePosXPlan = MovePosXPlan(self)
-		self.moveNegXPlan = MoveNegXPlan(self)
-		self.particleFilter = ParticleFilter()
+		self.motors = []
+		self.motors.append(ServoWrapperMX(self, self.robot.at.Nx28))
+		self.motors.append(ServoWrapperMX(self, self.robot.at.H11))
+
+		for motor in self.motors:
+			motor.start()
+
+		self.motorPlan = MotorPlan(self)
+		# self.movePosXPlan = MovePosXPlan(self)
+		# self.moveNegXPlan = MoveNegXPlan(self)
+		self.particleFilter = ParticleFilter(self)
 
 		self.startedFilter = False
 		self.auto = False
@@ -67,15 +72,21 @@ class MainApp(JoyApp):
 
 		if evt.type == KEYDOWN:
 			if evt.key == K_UP:
-				pass
-				# self.movePosYPlan.start()
+				self.motorPlan.setMotorNum(1)
+				self.motorPlan.setAngleIncrement(0.2)
+				self.motorPlan.start()
 			elif evt.key == K_DOWN:
-				pass
-				# self.moveNegYPlan.start()
+				self.motorPlan.setMotorNum(1)
+				self.motorPlan.setAngleIncrement(-0.2)
+				self.motorPlan.start()
 			elif evt.key == K_RIGHT:
-				self.movePosXPlan.start()
+				self.motorPlan.setMotorNum(0)
+				self.motorPlan.setAngleIncrement(0.2)
+				self.motorPlan.start()
 			elif evt.key == K_LEFT:
-				self.moveNegXPlan.start()
+				self.motorPlan.setMotorNum(0)
+				self.motorPlan.setAngleIncrement(-0.2)
+				self.motorPlan.start()
 			elif evt.key == K_RETURN:
 				self.startedFilter = not self.startedFilter
 				if (self.startedFilter):

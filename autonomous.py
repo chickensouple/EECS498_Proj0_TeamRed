@@ -4,6 +4,7 @@ from switch import *
 from directions import *
 import operator
 from mode import *
+import pdb
 
 class AutonomousPlanner:
   def __init__(self, robSim, actual, coordinateFrames): 
@@ -18,42 +19,42 @@ class AutonomousPlanner:
     self.directions[Directions.NegY] = array([0, -1])
 
   def updateFilter (self):
-  	pass
+    pass
     #Run filter computation, update d,r in robSim
     
   def plan(self, waypoints):
-  	"""
-  		plans the next step of the robot
-  		waypoints are in real coordinates
-  	"""
+    """
+      plans the next step of the robot
+      waypoints are in real coordinates
+    """
 
-  	if (self.switch.inMotion()):
-  		return
-  	if (len(waypoints) <= 1):
-  		return
+    if (self.switch.inMotion()):
+      return
+    if (len(waypoints) <= 1):
+      return
 
-  	currPos = array(self.switch.getPos())
-  	directionVec = waypoints[1] - currPos
-  	# print("Target Waypoint: " + str(waypoints[1]))
-  	# print("Current Pos: " + str(currPos))
-  	# print("DirectionVec: " + str(directionVec))
+    currPos = array(self.switch.getPos())
+    directionVec = array(waypoints[1]) - currPos
+    # print("Target Waypoint: " + str(waypoints[1]))
+    # print("Current Pos: " + str(currPos))
+    # print("DirectionVec: " + str(directionVec))
 
-  	directionDot = dict()
-  	for direction, vec in self.directions.iteritems():
-  		directionDot[direction] = dot(vec, directionVec)
+    directionDot = dict()
+    for direction, vec in self.directions.iteritems():
+      directionDot[direction] = dot(vec, directionVec)
 
-  	# gets the direction with the largest dot product
-  	direction = max(directionDot.iteritems(), key=operator.itemgetter(1))[0]
-  	print Directions.Names[direction]
-  	self.move(direction)
+    # gets the direction with the largest dot product
+    direction = max(directionDot.iteritems(), key=operator.itemgetter(1))[0]
+    print Directions.Names[direction]
+    self.move(direction)
 
   def move(self, direction):
-  	if (direction == Directions.PosX):
-  		self.switch.movePosX()
-  	elif (direction == Directions.NegX):
-  		self.switch.moveNegX()
-  	elif (direction == Directions.PosY):
-  		self.switch.movePosY()
-  	elif (direction == Directions.NegY):
-  		self.switch.moveNegY()
+    if (direction == Directions.PosX):
+      self.switch.movePosX()
+    elif (direction == Directions.NegX):
+      self.switch.moveNegX()
+    elif (direction == Directions.PosY):
+      self.switch.movePosY()
+    elif (direction == Directions.NegY):
+      self.switch.moveNegY()
 
