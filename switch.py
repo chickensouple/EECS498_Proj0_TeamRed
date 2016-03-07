@@ -1,7 +1,6 @@
 from redRobotSim import *
 from time import clock
-from mode import *
-from directions import *
+from common import *
 
 class Switch:
 	def __init__(self, mode, sim, actual):
@@ -65,6 +64,6 @@ class Switch:
 
 	def inMotion(self):
 		if (self.mode == Mode.SIMULATION):
-			return (clock() - self.lastTime < 1)
+			return (clock() - self.lastTime < 2.5)
 		elif (self.mode == Mode.ACTUAL):
 			return self.motorPlan.isRunning()

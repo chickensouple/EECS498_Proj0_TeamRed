@@ -41,7 +41,6 @@ class PositionFilter(Plan):
     self.direction = direction
 
   def setSensorAndWaypoints(self, sensor, waypoints):
-    #TODO: add low pass filter to sensor
     self.sensor = sensor
     if (len(waypoints) != len(self.waypoints)):
       self.coordinateFrames.calculateRealToWaypointTransformation(waypoints[0], waypoints[1])
@@ -67,10 +66,9 @@ class PositionFilter(Plan):
         if (self.sensorReady):
           self.sensorReady = False
           if (self.doneMoving):
-
-            pdb.set_trace()
-            self.doneMoving = False
             self.currentSensor = PositionFilter.convertSensor(self.sensor)
+            if (self.currentSensor[0] == -1 or self.currentSensor[1] == -1):
+              continue
             solutions = self.generateSolutions(self.currentSensor)
 
             minCost = -1
@@ -89,8 +87,12 @@ class PositionFilter(Plan):
             sensorDist = solutions[self.solutionNum][0]
             alpha = 0.5
             self.state.pos[1] = self.state.pos[1] + alpha * (sensorDist - self.state.pos[1])
+
+            self.doneMoving = False
           else:
             self.currentSensor = PositionFilter.convertSensor(self.sensor)
+            if (self.currentSensor[0] == -1 or self.currentSensor[1] == -1):
+              continue
             solutions = self.generateSolutions(self.currentSensor)
             sensorDist = solutions[self.solutionNum][0]
             alpha = 0.5
