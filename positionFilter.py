@@ -8,35 +8,35 @@ from coordinateFrames import *
 from joy import *
 import pdb
 
-
-class PositionFilterState:
-    IDLE = 0
-    STARTED_MOVING = 1
-    MOVING = 2
-
 class PositionFilter(Plan):
   def __init__(self, app, *arg, **kw):
     Plan.__init__(self, app, *arg, **kw)
-    self.state = PositionFilterState.IDLE
     self.moveReady = False
+    self.direction = None
     self.sensorReady = False
     self.sensor = []
     self.waypoints = []
-    self.direction = None
-    self.coordinateFrames = CoordinateFrames()
-    self.tagLength = tagLength
-    self.wheelSideLength = wheelSideLength
+    self.doneMoving = False
 
-    # self.states = []
-    # self.validStates = []
+
+    self.previousSensor = None
+    self.currentSensor = None
+    self.solutionNum = -1
+
+    self.coordinateFrames = CoordinateFrames()
+
     self.state = RobotState()
 
+    # constants
+    self.tagLength = tagLength
+    self.wheelSideLength = wheelSideLength
+    
+
   def setState(self, pos, yaw):
-    # self.states = [RobotState(pos, yaw - self.coordinateFrames.getRealToWaypointYaw())]
-    # self.validStates = [RobotState(pos, yaw - self.coordinateFrames.getRealToWaypointYaw())]
     self.state = RobotState(pos, yaw - self.coordinateFrames.getRealToWaypointYaw())
 
   def setControlInput(self, direction):
+    self.previousSensor = PositionFilter.convertSensor(self.sensor)
     self.moveReady = True
     self.direction = direction
 
@@ -56,13 +56,46 @@ class PositionFilter(Plan):
     #   self.state.yaw + self.coordinateFrames.getRealToWaypointYaw())
 
   def behavior(self):
-    self.state = PositionFilterState.IDLE
     self.moveReady = False
     self.sensorReady = False
     while True:
         if (self.moveReady):
           self.moveReady = False
           self.state = self.actionModel(self.state, self.direction)
+          self.doneMoving = True
+
+        if (self.sensorReady):
+          self.sensorReady = False
+          if (self.doneMoving):
+
+            pdb.set_trace()
+            self.doneMoving = False
+            self.currentSensor = PositionFilter.convertSensor(self.sensor)
+            solutions = self.generateSolutions(self.currentSensor)
+
+            minCost = -1
+            for idx, solution in enumerate(solutions):
+              d = solution[0]
+              theta = solution[1]
+
+              posDiff = abs(d - self.state.pos[1])
+              yawDiff = abs(theta - self.state.yaw)
+
+              cost = posDiff * posDiff + yawDiff * yawDiff
+              if (minCost == -1 or cost < minCost):
+                minCost = cost
+                self.solutionNum = idx
+
+            sensorDist = solutions[self.solutionNum][0]
+            alpha = 0.5
+            self.state.pos[1] = self.state.pos[1] + alpha * (sensorDist - self.state.pos[1])
+          else:
+            self.currentSensor = PositionFilter.convertSensor(self.sensor)
+            solutions = self.generateSolutions(self.currentSensor)
+            sensorDist = solutions[self.solutionNum][0]
+            alpha = 0.5
+            self.state.pos[1] = self.state.pos[1] + alpha * (sensorDist - self.state.pos[1])
+
 
         # if (self.state == PositionFilterState.STARTED_MOVING):
         #     self.state = PositionFilterState.MOVING
