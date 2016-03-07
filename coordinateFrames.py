@@ -1,12 +1,11 @@
 from numpy import *
 from numpy.linalg import lstsq, svd, inv
 from math498 import *
+from math import *
 
 class CoordinateFrames:
 	def __init__(self):
 		pass
-		self.lineDist = 0
-		self.lineDev = 0
 
 	def calculateRealToCameraTransformation(self, cameraPts, realPts):
 		# T turns cameraPts into realPts
@@ -45,6 +44,7 @@ class CoordinateFrames:
 
 		self.realWaypoint = array([v1, v2])
 		self.waypoint = waypoint1
+		self.waypointYaw = acos(self.realWaypoint[0, 0])
 
 	def convertRealToWaypoint(self, pt):
 		result = dot(self.realWaypoint, array(pt) - array(self.waypoint))
@@ -52,6 +52,10 @@ class CoordinateFrames:
 
 	def convertWaypointToReal(self, pt):
 		result = dot(self.realWaypoint.T, array(pt)) + self.waypoint
+		return result
+
+	def getRealToWaypointYaw(self):
+		return self.waypointYaw
 
 
 	@staticmethod

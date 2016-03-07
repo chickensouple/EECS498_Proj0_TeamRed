@@ -8,7 +8,6 @@ from coordinateFrames import *
 from joy import *
 import pdb
 
-
 class Particle:
   def __init__(self, pos=[0, 0], yaw=0, prob = 0):
     self.state = RobotState(pos, yaw)
@@ -20,17 +19,16 @@ class ParticleFilter(Plan):
     # noise constants
     self.xNoise = 0.1 # cm
     self.yNoise = 0.1 # cm
-    self.xYawBias = 0.001 # radians
-    self.yYawBias = 0.001 # radians
     self.yawNoise = 0.002 # radians
 
     self.tagLength = tagLength
 
     self.numChosenParticles = 100
-    self.numRandomParticles = 100
+    self.numRandomParticles = 10
     self.numTotalParticles = self.numChosenParticles + self.numRandomParticles
     self.particles = []
     self.wheelSideLength = wheelSideLength;
+    self.coordinateFrames = CoordinateFrames()
 
     self.equalProbability = 1.0 / self.numTotalParticles
     for i in range(self.numTotalParticles):
@@ -48,6 +46,8 @@ class ParticleFilter(Plan):
 
   def setSensorAndWaypoints(self, sensor, waypoints):
     self.sensor = sensor
+    if (len(waypoints) != len(self.waypoints)):
+      self.coordinateFrames.calculateRealToWaypointTransformation(waypoints[0], waypoints[1])
     self.waypoints = waypoints
 
   def behavior(self):
@@ -56,18 +56,7 @@ class ParticleFilter(Plan):
     waypoints is list of waypoints in real coordinates
     """
 
-
-    waypoint0 = array(self.waypoints[0])
-    waypoint1 = array(self.waypoints[1])
-
     sensorReal = array(ParticleFilter.convertSensor(self.sensor))
-    print("Sensor: " + str(sensorReal))
-    # check to see if sensor is probably outside of line segment
-    # if (abs(self.sensor[0] - self.sensor[1]) > 150):
-    #   if (self.sensor[0] == 0):
-    #     sensorFrontDist = -1
-    #   elif (self.sensor[1] == 0):
-    #     sensorBackDist = -1
 
     # updating each particle's probability with sensor model
     totalProb = 0
@@ -75,10 +64,9 @@ class ParticleFilter(Plan):
       rotatedLength = CoordinateFrames.rotateCCW([self.tagLength/2, 0], -particle.state.yaw)
       frontLoc = particle.state.pos + rotatedLength
       backLoc = particle.state.pos - rotatedLength
+      frontDist = frontLoc[1]
+      backDist = backLoc[1]
 
-      frontDist = lineToPtDist(waypoint1, waypoint0, frontLoc)
-      backDist = lineToPtDist(waypoint1, waypoint0, backLoc)
-      print("Pos: " + str(particle.state.pos) + "\tyaw: " + str(particle.state.yaw) + "\tDists: " + str([frontDist, backDist]))
       ParticleFilter.sensorModel(particle, 
         sensorReal,
         array([frontDist, backDist]))
@@ -117,7 +105,6 @@ class ParticleFilter(Plan):
 
     yield
 
-
     # draw scattering of particles around most probable
     for i in range(self.numRandomParticles):
       randPos = randn(2) * 5
@@ -128,36 +115,37 @@ class ParticleFilter(Plan):
         self.equalProbability)
       newParticles.append(newParticle)
 
-    pdb.set_trace()
     self.particles = newParticles
 
   def setState(self, pos, yaw):
+    """
+    input is position and yaw in real coordinates
+    """
     for particle in self.particles:
-      randPos = randn(2) * 10
+      randPos = randn(2) * 5
       randYaw = randn() * 0.05
 
       particle.prob = self.equalProbability
-      particle.state.pos = pos + randPos
-      particle.state.yaw = yaw + randYaw
+      particle.state.pos = self.coordinateFrames.convertRealToWaypoint(pos) + randPos
+      particle.state.yaw = -self.coordinateFrames.getRealToWaypointYaw() + yaw + randYaw
 
 
   def update(self, direction):
     # move each particle with noise
     for particle in self.particles:
-      if (direction == Directions.PosX):
-        particle.state.pos[0] += self.wheelSideLength + randn() * self.xNoise
-        particle.state.yaw += self.xYawBias
-      elif (direction == Directions.NegX):
-        particle.state.pos[0] -= self.wheelSideLength + randn() * self.xNoise
-        particle.state.yaw -= self.xYawBias
-      elif (direction == Directions.PosY):
-        particle.state.pos[1] += self.wheelSideLength + randn() * self.yNoise
-        particle.state.yaw += self.yYawBias
-      elif (direction == Directions.NegY):
-        particle.state.pos[1] -= self.wheelSideLength + randn() * self.yNoise
-        particle.state.yaw -= self.yYawBias
-      particle.state.yaw += randn() * self.yawNoise
+      travelDist = [0., 0.]
+      if direction == (Directions.PosX):
+        travelDist[0] += self.wheelSideLength + randn() * self.xNoise
+      elif direction == (Directions.NegX):
+        travelDist[0] -= self.wheelSideLength + randn() * self.xNoise
+      elif direction == (Directions.PosY):
+        travelDist[1] += self.wheelSideLength + randn() * self.yNoise
+      elif direction == (Directions.NegY):
+        travelDist[1] -= self.wheelSideLength + randn() * self.yNoise
 
+      rotatedTravelDir = CoordinateFrames.rotateCCW(travelDist, -particle.state.yaw)
+      particle.state.pos += array(rotatedTravelDir)
+      particle.state.yaw += randn() * self.yawNoise
 
   @staticmethod
   def sensorModel(particle, sensorDists, particleDists):
@@ -173,11 +161,11 @@ class ParticleFilter(Plan):
     # and for distsDiff > 0, p < 1 and drops off rapidly
     # how rapid the drop depends on the scalar
     sensorProb = exp(-distsDiff * scalar)
-    print("Dists Diff: " + str(distsDiff) + "\tsensorProb: " + str(sensorProb))
     particle.prob *= sensorProb
 
   def getState(self):
-    return self.mostProbable.state
+    realPos = self.coordinateFrames.convertWaypointToReal(self.mostProbable.state.pos)
+    return RobotState(realPos, self.mostProbable.state.yaw)
 
   @staticmethod
   def convertSensor(sensor):

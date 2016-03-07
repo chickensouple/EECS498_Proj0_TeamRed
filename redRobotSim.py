@@ -148,7 +148,7 @@ class RobotSimInterface( object ):
 
 
 class DummyRobotSim( RobotSimInterface ):
-  def __init__(self, particleFilter, *args, **kw):
+  def __init__(self, positionFilter, *args, **kw):
     RobotSimInterface.__init__(self, *args, **kw)
 
     # robot constants
@@ -169,7 +169,7 @@ class DummyRobotSim( RobotSimInterface ):
     self.pos = [0, 0]; # cm (x, y)
     self.yaw = 0; # radians
 
-    self.particleFilter = particleFilter
+    self.positionFilter = positionFilter
 
     # initializing coordinate frames
     self.coordinateFrames = CoordinateFrames()
