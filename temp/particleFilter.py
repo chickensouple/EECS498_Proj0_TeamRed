@@ -25,7 +25,7 @@ class ParticleFilter:
     self.yawNoise = 0.002 # radians
 
 
-    self.alpha = 0.2
+    self.alpha = 0.4
 	
     self.coordinateFrames = core.coordinateFrames
 

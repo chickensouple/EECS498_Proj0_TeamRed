@@ -45,6 +45,10 @@ class RobotSimulatorApp( JoyApp ):
     self.T0 = self.now
 
     # Setup autonomous mode timer
+    self.timeForAuto = self.onceEvery(1)
+    self.auto = False
+
+
     self.core = Core(Mode.SIMULATION, self)
     self.robSim = RedRobotSim(self.core, fn=None)
 
@@ -53,7 +57,7 @@ class RobotSimulatorApp( JoyApp ):
 
     self.startedFilter = False
 
-    self.logFile = open("log.txt", "w")
+    # self.logFile = open("log.txt", "w")
 
   def showSensors( self ):
     ts,f,b = self.sensor.lastSensor
@@ -112,6 +116,9 @@ class RobotSimulatorApp( JoyApp ):
     if self.timeForFilter():
       self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
+
+    if self.timeForAuto() and self.auto:
+      self.core.autonomousPlanner.plan(self.sensor.lastWaypoints[1])
 
     if evt.type == KEYDOWN:
       print("key: " + str(evt.key))

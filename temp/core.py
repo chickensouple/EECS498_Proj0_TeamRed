@@ -4,6 +4,7 @@ from common import *
 from time import *
 from coordinateFrames import *
 from particleFilter import *
+from autonomous import *
 
 class Core(Plan):
   def __init__(self, mode, app, *arg, **kw):
@@ -26,6 +27,8 @@ class Core(Plan):
 
     self.particleFilter = ParticleFilter(self)
     self.filterRunning = False
+
+    self.autonomousPlanner = AutonomousPlanner(self)
 
   def setSim(self, sim):
     self.sim = sim
