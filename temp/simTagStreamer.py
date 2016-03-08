@@ -11,6 +11,7 @@ from socket import (
 from math498 import *
 from time import clock
 from core import *
+import pdb
 
 class RobotSimulatorApp( JoyApp ):
   """Concrete class RobotSimulatorApp <<singleton>>
@@ -52,6 +53,8 @@ class RobotSimulatorApp( JoyApp ):
 
     self.startedFilter = False
 
+    self.logFile = open("log.txt", "w")
+
   def showSensors( self ):
     ts,f,b = self.sensor.lastSensor
     if ts:
@@ -84,6 +87,21 @@ class RobotSimulatorApp( JoyApp ):
         print("Estimated Pos(Real): " + str(self.core.particleFilter.getState().pos) + "\t" + str(self.core.particleFilter.getState().yaw))
       except:
         pass
+
+
+      # logging
+      # if (self.core.coordinateFrames.waypoint != None):
+      #   rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.robSim.yaw - self.core.coordinateFrames.getRealToWaypointYaw())
+      #   posWaypoint = self.core.coordinateFrames.convertRealToWaypoint(self.robSim.pos)
+      #   frontSensor = posWaypoint[1] + rotatedLength[1]
+      #   backSensor = posWaypoint[1] - rotatedLength[1]
+      #   if (self.sensor.lastSensor[1] > 5 and self.sensor.lastSensor[2] > 5):
+      #     self.logFile.write(str([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]))
+      #     self.logFile.write(str([frontSensor, backSensor]) + "\n")
+      #     print(rotatedLength)
+      #     print(str([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]) + str([frontSensor, backSensor]))
+
+
       # generate simulated laser readings
     elif self.timeForLaser():
       self.robSim.logLaserValue(self.now)

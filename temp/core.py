@@ -35,24 +35,36 @@ class Core(Plan):
 ####################
 
   def movePosX(self):
+    if (self.filterRunning):
+      self.particleFilter.actionModel(Directions.PosX)
+
     if (self.mode == Mode.SIMULATION):
       self.sim.moveX(1)
       self.lastTime = clock()
       self.startedMotion = True
 
   def moveNegX(self):
+    if (self.filterRunning):
+      self.particleFilter.actionModel(Directions.NegX)
+
     if (self.mode == Mode.SIMULATION):
       self.sim.moveX(-1)
       self.lastTime = clock()
       self.startedMotion = True
 
   def movePosY(self):
+    if (self.filterRunning):
+      self.particleFilter.actionModel(Directions.PosY)
+
     if (self.mode == Mode.SIMULATION):
       self.sim.moveY(1)
       self.lastTime = clock()
       self.startedMotion = True
 
   def moveNegY(self):
+    if (self.filterRunning):
+      self.particleFilter.actionModel(Directions.NegY)
+
     if (self.mode == Mode.SIMULATION):
       self.sim.moveY(-1)
       self.lastTime = clock()
