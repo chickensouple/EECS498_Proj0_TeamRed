@@ -140,37 +140,6 @@ class ParticleFilter:
     self.particles = newParticles
 
 
-
-    # solutions = ParticleFilter.generateSolutions(sensorReal)
-
-    # # assign new probabilities so that they 
-    # # are self.equalProbability (totalProb may not add up to 1 right now)
-    # newProb = self.equalProbability * totalProb
-
-    # numParticlesPerSolution = self.numRandomParticles / len(solutions)
-    # for i in range(self.numRandomParticles):
-    #   idx = len(self.particles) - i - 1
-
-    #   randPos = randn() * 1.5
-    #   randYaw = randn() * 0.03
-
-    #   solutionNum = int(floor(i / numParticlesPerSolution))
-
-    #   solution = solutions[solutionNum]
-    
-    #   totalProb += newProb - self.particles[idx].prob
-
-    #   self.particles[idx] = Particle(solution[0] + randPos, solution[1] + randYaw, newProb)
-
-    # # scale probabilities so they add to one
-    # scalar = 1.0 / totalProb
-    # for particle in self.particles:
-    #   particle.prob *= scalar
-
-    # print("prob: " + str(self.particles[0].prob))
-
-
-
   def correctR(self, sensorReal, sensor):
     # modify self.r if necessary
     rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.mostProbable.yaw)
@@ -261,27 +230,6 @@ class ParticleFilter:
         print("after r: " + str(self.r))
 
 
-    # elif (sensorReal[1] != -1 and backR < 0):
-    #   # we are actually in between waypoints
-    #   # but we think we are too close to the start waypoint
-    #   # increase r
-    # elif (sensorReal[1] == -1 and backR > 0):
-    #   # we think we are between waypoints but we are actually
-    #   # too close to start of waypoint
-    #   # decrease r so that it is within start position
-    #   self.r = 
-    # elif (sensorReal[0] != -1 and frontR > waypointDist):
-    #   # we think we are very close to end, but actually
-    #   # we are at not as large of an R
-    #   # decrease r
-    # elif (sensorReal[0] == -1 and frontR < waypointDist):
-    #   # we think we are not yet close to end waypoint,
-    #   # but actually we are
-    #   # increase r so that it is within end position
-
-
-
-
   @staticmethod
   def generateSolutions(sensor):
     solutions = []
@@ -326,9 +274,9 @@ class ParticleFilter:
 
     # the probability we multiply our particle prob by,
     # p = P(sensor value | particle location), will be
-    # e^(-distsDiff * scalar)
-    # so that when distsDiff is 0, p=1
-    # and for distsDiff > 0, p < 1 and drops off rapidly
+    # e^(-(distsDiff + yawDiff) * scalar)
+    # so that when distsDiff+yawDiff is 0, p=1
+    # and for distsDiff+yawDiff > 0, p < 1 and drops off rapidly
     # how rapid the drop depends on the scalar
     sensorProb = exp(-(distsDiff + yawDiff) * scalar)
     particle.prob *= sensorProb
@@ -376,9 +324,10 @@ class ParticleFilter:
     # model for sensor is
     # y: real dist
     # x: sensor dist
-    # # y = 0.0007762568 * x^2 - 0.4104391031*x + 55.0759770855
-    # ret = 0.0007762568 * sensor * sensor - \
-    #   0.4104391031 * sensor + 55.0759770855
+    # y = -0.074 * x + 17.4935
+    # TODO: actual data looks slightly quadratic
+    # fit a quadratic curve but make sure
+    # behaviour near 255 is good, because that's the most important area
 
     ret = -0.074 * sensor + 17.4935
     if (ret[0] < 0):

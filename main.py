@@ -9,7 +9,7 @@ from socket import (
   socket, AF_INET,SOCK_DGRAM, IPPROTO_UDP, error as SocketError,
   )
 
-numMotors = 2
+numMotors = 4
 
 class MainApp(JoyApp):
   """ Main app to run the program that controls our robot """
@@ -22,7 +22,10 @@ class MainApp(JoyApp):
 
     self.motors = []
     self.motors.append(ServoWrapperMX(self, self.robot.at.Nx28))
-    self.motors.append(ServoWrapperMX(self, self.robot.at.H11))
+    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx0A))
+
+    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx04))
+    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx57))
 
     for motor in self.motors:
       motor.start()
