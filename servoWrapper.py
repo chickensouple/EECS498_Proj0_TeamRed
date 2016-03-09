@@ -30,11 +30,11 @@ class ServoWrapperMX(Plan):
         self.__dict__.update(kw)
         self._ensure_motor = self._set_motor
         self._ensure_servo = self._set_servo
-        self.desAng = self.get_ang()
 
     def behavior(self):
         """execute an interaction of the controller update loop"""
         self.is_slack = False
+        self.desAng = self.get_ang()
         while True:
           a = exp(1j * self.get_ang()*2*pi)
           a0 = exp(1j * self.desAng*2*pi)
