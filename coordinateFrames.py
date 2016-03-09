@@ -5,7 +5,11 @@ from math import *
 
 class CoordinateFrames:
 	def __init__(self):
-		pass
+		self.T = None
+		self.T_inverse = None
+		self.realWaypoint = None
+		self.waypoint = None
+		self.waypointYaw = None
 
 	def calculateRealToCameraTransformation(self, cameraPts, realPts):
 		# T turns cameraPts into realPts
@@ -44,7 +48,7 @@ class CoordinateFrames:
 
 		self.realWaypoint = array([v1, v2])
 		self.waypoint = waypoint1
-		self.waypointYaw = acos(self.realWaypoint[0, 0])
+		self.waypointYaw = atan2(self.realWaypoint[0, 1], self.realWaypoint[0, 0])
 
 	def convertRealToWaypoint(self, pt):
 		result = dot(self.realWaypoint, array(pt) - array(self.waypoint))
@@ -56,7 +60,6 @@ class CoordinateFrames:
 
 	def getRealToWaypointYaw(self):
 		return self.waypointYaw
-
 
 	@staticmethod
 	def rotateCCW(pt, yaw):

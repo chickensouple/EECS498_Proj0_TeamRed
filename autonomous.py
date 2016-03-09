@@ -1,26 +1,17 @@
 from numpy import *
-from coordinateFrames import *
-from switch import *
-from directions import *
+from common import *
 import operator
-from mode import *
 import pdb
 
 class AutonomousPlanner:
-  def __init__(self, robSim, actual, coordinateFrames): 
+  def __init__(self, core): 
     #Get reference to the single robSim instance
-    # self.robSim = robSim
-    self.switch = Switch(Mode.SIMULATION, robSim, actual)
-    self.coordinateFrames = coordinateFrames;
+    self.core = core
     self.directions = dict()
     self.directions[Directions.PosX] = array([1, 0])
     self.directions[Directions.NegX] = array([-1, 0])
     self.directions[Directions.PosY] = array([0, 1])
     self.directions[Directions.NegY] = array([0, -1])
-
-  def updateFilter (self):
-    pass
-    #Run filter computation, update d,r in robSim
     
   def plan(self, waypoints):
     """
@@ -28,12 +19,12 @@ class AutonomousPlanner:
       waypoints are in real coordinates
     """
 
-    if (self.switch.inMotion()):
+    if (self.core.inMotion()):
       return
     if (len(waypoints) <= 1):
       return
 
-    currPos = array(self.switch.getPos())
+    currPos = array(self.core.particleFilter.getState().pos)
     directionVec = array(waypoints[1]) - currPos
     # print("Target Waypoint: " + str(waypoints[1]))
     # print("Current Pos: " + str(currPos))
@@ -50,11 +41,11 @@ class AutonomousPlanner:
 
   def move(self, direction):
     if (direction == Directions.PosX):
-      self.switch.movePosX()
+      self.core.movePosX()
     elif (direction == Directions.NegX):
-      self.switch.moveNegX()
+      self.core.moveNegX()
     elif (direction == Directions.PosY):
-      self.switch.movePosY()
+      self.core.movePosY()
     elif (direction == Directions.NegY):
-      self.switch.moveNegY()
+      self.core.moveNegY()
 

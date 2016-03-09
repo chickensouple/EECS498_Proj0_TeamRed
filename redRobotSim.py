@@ -14,9 +14,7 @@ from joy import *
 
 from pdb import set_trace as DEBUG
 from coordinateFrames import *
-from autonomous import *
-from particleFilter import *
-from constants import *
+from common import *
 
 MSG_TEMPLATE = {
        0: [[502, 251], [479, 272], [508, 296], [530, 274]],
@@ -147,13 +145,9 @@ class RobotSimInterface( object ):
     return "Laser: %d,%d " % tuple(x)
 
 
-class DummyRobotSim( RobotSimInterface ):
-  def __init__(self, positionFilter, *args, **kw):
+class RedRobotSim( RobotSimInterface ):
+  def __init__(self, core, *args, **kw):
     RobotSimInterface.__init__(self, *args, **kw)
-
-    # robot constants
-    self.wheelNumSides = wheelNumSides;
-    self.wheelSideLength = wheelSideLength; # cm
 
     # robot simulation constants
     self.wheelXNoise = 0.1 # cm
@@ -161,23 +155,17 @@ class DummyRobotSim( RobotSimInterface ):
     self.yawNoise = 0.002 # radians
     self.xYawBias = 0.001 # radians
     self.yYawBias = -0.001 # radians
-
-    # environment constants
-    self.tagLength = tagLength; # cm
-
+    
     # state
     self.pos = [0, 0]; # cm (x, y)
     self.yaw = 0; # radians
 
-    self.positionFilter = positionFilter
+    self.core = core
 
     # initializing coordinate frames
-    self.coordinateFrames = CoordinateFrames()
     cameraPts = array([sum(MSG_TEMPLATE[tid], axis=0)/4 for tid in corners])
     cameraPts = concatenate((cameraPts, [[1]]*8), axis=1)
-    self.coordinateFrames.calculateRealToCameraTransformation(cameraPts, ref)
-
-    self.autonomousPlanner = AutonomousPlanner(self, None, self.coordinateFrames)
+    self.core.coordinateFrames.calculateRealToCameraTransformation(cameraPts, ref)
 
     self.drawRobotCorners()
 
@@ -185,9 +173,9 @@ class DummyRobotSim( RobotSimInterface ):
     """
     Redraws the corners of the tag based on 
     self.pos, self.yaw
-    and self.tagLength
+    and Constants.tagLength
     """
-    L = self.tagLength
+    L = Constants.tagLength
     borderPts = [[L/2, L/2],
       [L/2, -L/2],
       [-L/2, -L/2],
@@ -197,9 +185,7 @@ class DummyRobotSim( RobotSimInterface ):
       tagDiffs[i] = CoordinateFrames.rotateCCW(borderPts[i], self.yaw)
     realTagPos = tagDiffs + self.pos
     for i in range(len(realTagPos)):
-      self.tagPos[i] = self.coordinateFrames.convertRealToCamera(realTagPos[i])
-  
-  # def getSensorLocations(self):
+      self.tagPos[i] = self.core.coordinateFrames.convertRealToCamera(realTagPos[i])
 
   def moveX( self, dist ):
     """
@@ -207,9 +193,11 @@ class DummyRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
-    self.pos[0] += (int(dist) * self.wheelSideLength) + (randn() * self.wheelXNoise)
+    print("Prev: " + str(self.pos))
+    self.pos[0] += (int(dist) * Constants.wheelSideLength) + (randn() * self.wheelXNoise)
     self.yaw += (randn() * self.yawNoise) + self.xYawBias
     self.drawRobotCorners()
+    print("After: " + str(self.pos))
 
   def moveY(self, dist):
     """
@@ -217,7 +205,7 @@ class DummyRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
-    self.pos[1] += (int(dist) * self.wheelSideLength) + (randn() * self.wheelYNoise)
+    self.pos[1] += (int(dist) * Constants.wheelSideLength) + (randn() * self.wheelYNoise)
     self.yaw += (randn() * self.yawNoise) + self.yYawBias
     self.drawRobotCorners()
 
