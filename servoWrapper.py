@@ -30,6 +30,7 @@ class ServoWrapperMX(Plan):
         self.__dict__.update(kw)
         self._ensure_motor = self._set_motor
         self._ensure_servo = self._set_servo
+        self.desAng = self.get_ang()
 
     def behavior(self):
         """execute an interaction of the controller update loop"""
