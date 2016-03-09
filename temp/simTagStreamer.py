@@ -121,7 +121,6 @@ class RobotSimulatorApp( JoyApp ):
       self.core.autonomousPlanner.plan(self.sensor.lastWaypoints[1])
 
     if evt.type == KEYDOWN:
-      print("key: " + str(evt.key))
       if evt.key == K_UP:
         self.core.movePosY()
         return progress("(say) Up")

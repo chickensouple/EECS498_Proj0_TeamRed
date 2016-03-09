@@ -40,42 +40,60 @@ class Core(Plan):
   def movePosX(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.PosX)
+    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveX(1)
       self.lastTime = clock()
-      self.startedMotion = True
+    elif (self.mode == Mode.ACTUAL):
+      self.actual.motorPlan.setMotorNum(0)
+      self.actual.motorPlan.setAngleIncrement(0.2)
+      self.actual.motorPlan.start()
 
   def moveNegX(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.NegX)
+    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveX(-1)
       self.lastTime = clock()
-      self.startedMotion = True
+    elif (self.mode == Mode.ACTUAL):
+      self.actual.motorPlan.setMotorNum(0)
+      self.actual.motorPlan.setAngleIncrement(-0.2)
+      self.actual.motorPlan.start()
 
   def movePosY(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.PosY)
+    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveY(1)
       self.lastTime = clock()
-      self.startedMotion = True
+    elif (self.mode == Mode.ACTUAL):
+      self.actual.motorPlan.setMotorNum(1)
+      self.actual.motorPlan.setAngleIncrement(0.2)
+      self.actual.motorPlan.start()
 
   def moveNegY(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.NegY)
+    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveY(-1)
       self.lastTime = clock()
-      self.startedMotion = True
+    elif (self.mode == Mode.ACTUAL):
+      self.actual.motorPlan.setMotorNum(1)
+      self.actual.motorPlan.setAngleIncrement(-0.2)
+      self.actual.motorPlan.start()
 
   def inMotion(self):
     if (self.mode == Mode.SIMULATION):
       return (clock() - self.lastTime < 2)
+    elif (self.mode == Mode.ACTUAL):
+      return self.app.motorPlan.isRunning()
 
 #########################
 ## FILTER
