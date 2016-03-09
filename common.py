@@ -43,3 +43,7 @@ class Mode:
 	SIMULATION = 0
 	ACTUAL = 1
 
+class MotorDir:
+	X = 0
+	Y = 1
+
