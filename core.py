@@ -47,6 +47,8 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(0)
+      if (not self.app.motorPlan.isRunning()):
+        return
       self.app.motorPlan.setDir(MotorDir.X)
       self.app.motorPlan.setAngleIncrement(0.2)
       self.app.motorPlan.start()
@@ -61,6 +63,8 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(0)
+      if (not self.app.motorPlan.isRunning()):
+        return
       self.app.motorPlan.setDir(MotorDir.X)
       self.app.motorPlan.setAngleIncrement(-0.2)
       self.app.motorPlan.start()
@@ -75,6 +79,8 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(1)
+      if (not self.app.motorPlan.isRunning()):
+        return
       self.app.motorPlan.setDir(MotorDir.Y)
       self.app.motorPlan.setAngleIncrement(0.2)
       self.app.motorPlan.start()
@@ -89,6 +95,8 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(1)
+      if (not self.app.motorPlan.isRunning()):
+        return
       self.app.motorPlan.setDir(MotorDir.Y)
       self.app.motorPlan.setAngleIncrement(-0.2)
       self.app.motorPlan.start()

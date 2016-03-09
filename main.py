@@ -25,7 +25,7 @@ class MainApp(JoyApp):
     self.motors.append(ServoWrapperMX(self, self.robot.at.Nx0A))
 
     self.motors.append(ServoWrapperMX(self, self.robot.at.K12))
-    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx57))
+    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx59))
 
     for motor in self.motors:
       motor.start()

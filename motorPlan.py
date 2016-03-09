@@ -1,5 +1,6 @@
 from joy import *
 from math498 import *
+from common import *
 
 class MotorPlan(Plan):
   def __init__(self, app, *arg, **kw):

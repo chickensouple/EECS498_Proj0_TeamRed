@@ -19,7 +19,7 @@ class ServoWrapperMX(Plan):
         # Orientation of motor; change to -1 to flip
         self.ori = 1
         # Update rate -- time to sleep between controller updates
-        self.rate = 0.1 
+        self.rate = 0.05 
         ### Internal variables
         self.desAng = 0
         self.desRPM = 0
