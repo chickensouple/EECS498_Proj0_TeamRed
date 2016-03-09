@@ -46,9 +46,9 @@ class Core(Plan):
       self.sim.moveX(1)
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
-      self.actual.motorPlan.setMotorNum(0)
-      self.actual.motorPlan.setAngleIncrement(0.2)
-      self.actual.motorPlan.start()
+      self.app.motorPlan.setMotorNum(0)
+      self.app.motorPlan.setAngleIncrement(0.2)
+      self.app.motorPlan.start()
 
   def moveNegX(self):
     if (self.filterRunning):
@@ -59,9 +59,9 @@ class Core(Plan):
       self.sim.moveX(-1)
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
-      self.actual.motorPlan.setMotorNum(0)
-      self.actual.motorPlan.setAngleIncrement(-0.2)
-      self.actual.motorPlan.start()
+      self.app.motorPlan.setMotorNum(0)
+      self.app.motorPlan.setAngleIncrement(-0.2)
+      self.app.motorPlan.start()
 
   def movePosY(self):
     if (self.filterRunning):
@@ -72,9 +72,9 @@ class Core(Plan):
       self.sim.moveY(1)
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
-      self.actual.motorPlan.setMotorNum(1)
-      self.actual.motorPlan.setAngleIncrement(0.2)
-      self.actual.motorPlan.start()
+      self.app.motorPlan.setMotorNum(1)
+      self.app.motorPlan.setAngleIncrement(0.2)
+      self.app.motorPlan.start()
 
   def moveNegY(self):
     if (self.filterRunning):
@@ -85,9 +85,9 @@ class Core(Plan):
       self.sim.moveY(-1)
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
-      self.actual.motorPlan.setMotorNum(1)
-      self.actual.motorPlan.setAngleIncrement(-0.2)
-      self.actual.motorPlan.start()
+      self.app.motorPlan.setMotorNum(1)
+      self.app.motorPlan.setAngleIncrement(-0.2)
+      self.app.motorPlan.start()
 
   def inMotion(self):
     if (self.mode == Mode.SIMULATION):
