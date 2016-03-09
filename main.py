@@ -22,7 +22,7 @@ class MainApp(JoyApp):
 
     self.motors = []
     self.motors.append(ServoWrapperMX(self, self.robot.at.Nx28))
-    self.motors.append(ServoWrapperMX(self, self.robot.at.NxK12))
+    self.motors.append(ServoWrapperMX(self, self.robot.at.K12))
 
     self.motors.append(ServoWrapperMX(self, self.robot.at.Nx04))
     self.motors.append(ServoWrapperMX(self, self.robot.at.Nx57))
