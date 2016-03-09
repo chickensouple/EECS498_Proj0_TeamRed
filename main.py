@@ -9,7 +9,7 @@ from socket import (
   socket, AF_INET,SOCK_DGRAM, IPPROTO_UDP, error as SocketError,
   )
 
-numMotors = 2;
+numMotors = 2
 
 class MainApp(JoyApp):
   """ Main app to run the program that controls our robot """

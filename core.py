@@ -122,9 +122,9 @@ class Core(Plan):
       yield
 
 
-      if (self.startedMotion):
-        if (not self.inMotion):
-          self.startedMotion = False
+      # if (self.startedMotion):
+      #   if (not self.inMotion):
+      #     self.startedMotion = False
 
-      yield
+      # yield
 

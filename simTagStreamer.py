@@ -85,12 +85,14 @@ class RobotSimulatorApp( JoyApp ):
       self.showSensors()
       print("CurrPos(Camera): " + str(self.core.coordinateFrames.convertRealToCamera(self.robSim.pos)))
       print("CurrPos(Real): " + str(self.robSim.pos))
-      progress( self.robSim.logLaserValue(self.now) )
       try:
+        # print("Estimated Pos(Real): " + str(self.core.particleFilter.getState().pos) + "\t" + str(self.core.particleFilter.getState().yaw))
         print("CurrPos(waypts): " + str(self.core.coordinateFrames.convertRealToWaypoint(self.robSim.pos)) + "\t" + str(self.robSim.yaw - self.core.coordinateFrames.getRealToWaypointYaw()))
-        print("Estimated Pos(Real): " + str(self.core.particleFilter.getState().pos) + "\t" + str(self.core.particleFilter.getState().yaw))
+        print("EstimatedPos(waypts): " + str(self.core.particleFilter.getWaypointState().pos) + "\t" + str(self.core.particleFilter.getWaypointState().yaw))
       except:
         pass
+
+      progress( self.robSim.logLaserValue(self.now) )
 
 
       # logging

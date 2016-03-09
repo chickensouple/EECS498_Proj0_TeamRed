@@ -36,7 +36,6 @@ class AutonomousPlanner:
 
     # gets the direction with the largest dot product
     direction = max(directionDot.iteritems(), key=operator.itemgetter(1))[0]
-    print Directions.Names[direction]
     self.move(direction)
 
   def move(self, direction):

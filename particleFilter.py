@@ -84,7 +84,7 @@ class ParticleFilter:
     sensorReal = array(ParticleFilter.convertSensor(self.sensor))
 
     # try to localize R
-    # self.correctR(sensorReal)
+    self.correctR(sensorReal, self.sensor)
 
     for particle in self.particles:
       rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], particle.yaw)
@@ -171,7 +171,7 @@ class ParticleFilter:
 
 
 
-  def correctR(self, realSensor):
+  def correctR(self, sensorReal, sensor):
     # modify self.r if necessary
     rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.mostProbable.yaw)
 
@@ -191,10 +191,12 @@ class ParticleFilter:
         if (self.r < waypointDist / 2):
           # closest to start
           # decrease r
+          print("Case 1 start")
           self.r -= (waypointDist) / 10
         else:
           # closest to end
           # increase r
+          print("Case 1 end")
           self.r += (waypointDist) / 10
     elif (sensorReal[1] == -1 or sensorReal[0] == -1):
       # one sensor is no longer in range of waypoints
@@ -205,14 +207,20 @@ class ParticleFilter:
         if (self.r < waypointDist / 2):
           # we are close to start
           # move r to within range [0, rotatedLength[1]]
-          self.r = uniform() * rotatedLength[1]
+          print("Case 2 a start")
+          print("actual f and b: " + str(sensorReal) + "\t" + str(sensor))
+          print("estimated f and b: " + str([frontR, backR]))
+          print("before r: " + str(self.r))
+          self.r = self.r - abs(rotatedLength[0]) * 0.2
+          print("after r: " + str(self.r))
         else:
           # we are close to end
           # move r to within range
-          self.r = waypointDist - (uniform * rotatedLength[1])
+          print("Case 2 a end")
+          self.r = self.r + abs(rotatedLength[0]) * 0.2
 
       if ((backR < 0 or backR > waypointDist) and 
-        (frontR < 0 and frontR > waypointDist)):
+        (frontR < 0 or frontR > waypointDist)):
         # our estimate is completely off
 
 
@@ -220,11 +228,13 @@ class ParticleFilter:
         if (self.r < waypointDist / 2):
           # we are close to start
           # move r to within range [0, rotatedLength[1]]
-          self.r = uniform() * rotatedLength[1]
+          print("Case 2 b start")
+          self.r = uniform() * abs(rotatedLength[0])
         else:
           # we are close to end
           # move r to within range
-          self.r = waypointDist - (uniform * rotatedLength[1])
+          print("Case 2 b end")
+          self.r = waypointDist - (uniform() * abs(rotatedLength[0]))
     elif (backR < 0 or backR > waypointDist or 
       frontR < 0 or frontR > waypointDist):
       # we estimate that our sensors are not between waypoints
@@ -234,11 +244,21 @@ class ParticleFilter:
       if (self.r < waypointDist / 2):
         # we are close to start
         # move r to within range [0, rotatedLength[1]]
-        self.r = uniform() * rotatedLength[1]
+        print("Case 3 start")
+        print("actual f and b: " + str(sensorReal) + "\t" + str(sensor))
+        print("estimated f and b: " + str([frontR, backR]))
+        print("before r: " + str(self.r))
+        self.r = abs(rotatedLength[0])
+        print("after r: " + str(self.r))
       else:
         # we are close to end
         # move r to within range
-        self.r = waypointDist - (uniform * rotatedLength[1])
+        print("Case 3 end")
+        print("actual f and b: " + str(sensorReal) + "\t" + str(sensor))
+        print("estimated f and b: " + str([frontR, backR]))
+        print("before r: " + str(self.r))
+        self.r = waypointDist - abs(rotatedLength[0])
+        print("after r: " + str(self.r))
 
 
     # elif (sensorReal[1] != -1 and backR < 0):
@@ -346,6 +366,10 @@ class ParticleFilter:
     realPos = self.coordinateFrames.convertWaypointToReal([self.r, self.mostProbable.d])
     return RobotState(realPos, self.mostProbable.yaw)
 
+
+  def getWaypointState(self):
+    return RobotState([self.r, self.mostProbable.d], self.mostProbable.yaw)
+
   @staticmethod
   def convertSensor(sensor):
     # converts sensor values into real distances
@@ -362,9 +386,9 @@ class ParticleFilter:
     if (ret[1] < 0):
       ret[1] = 0
 
-    if (sensor[0] < 5):
+    if (sensor[0] < 10):
       ret[0] = -1
-    if (sensor[1] < 5):
+    if (sensor[1] < 10):
       ret[1] = -1
     return ret
 

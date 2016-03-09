@@ -155,6 +155,8 @@ class RedRobotSim( RobotSimInterface ):
     self.yawNoise = 0.002 # radians
     self.xYawBias = 0.001 # radians
     self.yYawBias = -0.001 # radians
+
+    self.slipBias = 0.2 # cm
     
     # state
     self.pos = [0, 0]; # cm (x, y)
@@ -193,11 +195,10 @@ class RedRobotSim( RobotSimInterface ):
     dist is the number of sides the wheel will turn
     must be an integer
     """
-    print("Prev: " + str(self.pos))
     self.pos[0] += (int(dist) * Constants.wheelSideLength) + (randn() * self.wheelXNoise)
+    self.pos[0] -= (dist / abs(dist)) * abs(randn()) * self.slipBias
     self.yaw += (randn() * self.yawNoise) + self.xYawBias
     self.drawRobotCorners()
-    print("After: " + str(self.pos))
 
   def moveY(self, dist):
     """
@@ -206,6 +207,7 @@ class RedRobotSim( RobotSimInterface ):
     must be an integer
     """
     self.pos[1] += (int(dist) * Constants.wheelSideLength) + (randn() * self.wheelYNoise)
+    self.pos[1] -= (dist / abs(dist)) * abs(randn()) * self.slipBias
     self.yaw += (randn() * self.yawNoise) + self.yYawBias
     self.drawRobotCorners()
 
