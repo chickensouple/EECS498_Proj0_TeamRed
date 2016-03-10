@@ -266,8 +266,8 @@ class ParticleFilter:
     # Yawdiff measures how close the yaw of the particle is to our 
     # estimated yaw
     yawScalar = 50
-    # yawDiff = yawScalar * abs(particle.yaw - self.mostProbable.yaw)
-    yawDiff = yawScalar * abs(particle.yaw + self.coordinateFrames.getRealToWaypointYaw())
+    yawDiff = yawScalar * abs(particle.yaw - self.mostProbable.yaw)
+    # yawDiff = yawScalar * abs(particle.yaw + self.coordinateFrames.getRealToWaypointYaw())
 
     # scalar = 0.2231
     scalar = 0.11
@@ -324,21 +324,17 @@ class ParticleFilter:
     # model for sensor is
     # y: real dist
     # x: sensor dist
-    # y = -0.074 * x + 17.4935
-    # TODO: actual data looks slightly quadratic
-    # fit a quadratic curve but make sure
-    # behaviour near 255 is good, because that's the most important area
+    # y = t * sqrt((255 / x) - 1)
 
-    ret = -0.074 * sensor + 17.4935
-    if (ret[0] < 0):
-      ret[0] = 0
-    if (ret[1] < 0):
-      ret[1] = 0
 
-    if (sensor[0] < 10):
-      ret[0] = -1
-    if (sensor[1] < 10):
-      ret[1] = -1
+    t = 6.5 # cm
+
+    ret = [-1, -1]
+    if (sensor[0] >= 10):
+      ret[0] = t * sqrt((255. / sensor[0]) - 1)
+    if (sensor[1] >= 10):
+      ret[1] = t * sqrt((255. / sensor[1]) - 1)
+
     return ret
 
 

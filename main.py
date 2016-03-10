@@ -52,7 +52,6 @@ class MainApp(JoyApp):
       if (not motor.isRunning()):
         motor.start()
 
-
     if self.timeForFilter():
       self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
