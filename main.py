@@ -19,19 +19,10 @@ class MainApp(JoyApp):
     self.srvAddr = (wphAddr, APRIL_DATA_PORT)
 
   def onStart(self):
-
-    self.motors = []
-    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx28))
-    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx0A))
-
-    self.motors.append(ServoWrapperMX(self, self.robot.at.K12))
-    self.motors.append(ServoWrapperMX(self, self.robot.at.Nx59))
-
-    for motor in self.motors:
-      motor.start()
+    self.xMotors = [self.robot.at.Nx02, self.robot.at.Nx04]
+    self.yMotors = [self.robot.at.Nx06, self.robot.at.Nx08]
 
     self.motorPlan = MotorPlan(self)
-
 
     self.core = Core(Mode.ACTUAL, self)
     self.core.start()
@@ -39,6 +30,9 @@ class MainApp(JoyApp):
     self.timeForFilter = self.onceEvery(1.0/10.0)
     self.startedFilter = False
     self.auto = False
+
+
+    self.timeForServoMeasure = self.onceEvery(1.0/2.0)
 
     #sensor stuff
     self.sensor = SensorPlanTCP(self, server=self.srvAddr[0])
@@ -58,6 +52,10 @@ class MainApp(JoyApp):
 
     if self.timeForAuto() and self.auto:
       self.core.autonomousPlanner.plan(self.sensor.lastWaypoints[1])
+
+
+    if self.timeForServoMeasure():
+      pass
 
     if evt.type == KEYDOWN:
       if evt.key == K_UP:

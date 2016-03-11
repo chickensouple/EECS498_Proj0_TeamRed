@@ -49,9 +49,8 @@ class Core(Plan):
       # self.app.motorPlan.setMotorNum(0)
       if (not self.app.motorPlan.isRunning()):
         return
-      self.app.motorPlan.setDir(MotorDir.X)
-      self.app.motorPlan.setAngleIncrement(0.2)
-      self.app.motorPlan.start()
+      self.app.motorPlan.setDirection(Directions.PosX)
+      self.app.MotorPlan.start()
 
   def moveNegX(self):
     if (self.filterRunning):
@@ -65,9 +64,8 @@ class Core(Plan):
       # self.app.motorPlan.setMotorNum(0)
       if (not self.app.motorPlan.isRunning()):
         return
-      self.app.motorPlan.setDir(MotorDir.X)
-      self.app.motorPlan.setAngleIncrement(-0.2)
-      self.app.motorPlan.start()
+      self.app.motorPlan.setDirection(Directions.NegX)
+      self.app.MotorPlan.start()
 
   def movePosY(self):
     if (self.filterRunning):
@@ -81,9 +79,8 @@ class Core(Plan):
       # self.app.motorPlan.setMotorNum(1)
       if (not self.app.motorPlan.isRunning()):
         return
-      self.app.motorPlan.setDir(MotorDir.Y)
-      self.app.motorPlan.setAngleIncrement(0.2)
-      self.app.motorPlan.start()
+      self.app.motorPlan.setDirection(Directions.PosY)
+      self.app.MotorPlan.start()
 
   def moveNegY(self):
     if (self.filterRunning):
@@ -97,9 +94,8 @@ class Core(Plan):
       # self.app.motorPlan.setMotorNum(1)
       if (not self.app.motorPlan.isRunning()):
         return
-      self.app.motorPlan.setDir(MotorDir.Y)
-      self.app.motorPlan.setAngleIncrement(-0.2)
-      self.app.motorPlan.start()
+      self.app.motorPlan.setDirection(Directions.NegY)
+      self.app.MotorPlan.start()
 
   def inMotion(self):
     if (self.mode == Mode.SIMULATION):
