@@ -32,10 +32,10 @@ class MotorPlan(Plan):
       torque = -self.torque
 
 
-    currAng0 = motors[0].get_ang()
+    currAng0 = motors[0].get_xpos()
     targetAng0 = currAng + currAng0
 
-    currAng1 = motors[1].get_ang()
+    currAng1 = motors[1].get_xpos()
     targetAng1 = currAng - currAng1
 
     motors[0].set_torque(torque)
@@ -43,8 +43,8 @@ class MotorPlan(Plan):
 
     threshold = 0.2
 
-    while(abs(targetAng0 - motors[0].get_ang()) > threshold and
-      abs(targetAng1 - motors[1].get_ang())):
+    while(abs(targetAng0 - motors[0].get_xpos()) > threshold and
+      abs(targetAng1 - motors[1].get_xpos())):
       yield self.forDuration(0.05)
 
 
