@@ -47,7 +47,7 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(0)
-      if (not self.app.motorPlan.isRunning()):
+      if (self.app.motorPlan.isRunning()):
         return
       self.app.motorPlan.setDirection(Directions.PosX)
       self.app.MotorPlan.start()
@@ -62,7 +62,7 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(0)
-      if (not self.app.motorPlan.isRunning()):
+      if (self.app.motorPlan.isRunning()):
         return
       self.app.motorPlan.setDirection(Directions.NegX)
       self.app.MotorPlan.start()
@@ -77,7 +77,7 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(1)
-      if (not self.app.motorPlan.isRunning()):
+      if (self.app.motorPlan.isRunning()):
         return
       self.app.motorPlan.setDirection(Directions.PosY)
       self.app.MotorPlan.start()
@@ -92,7 +92,7 @@ class Core(Plan):
       self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(1)
-      if (not self.app.motorPlan.isRunning()):
+      if (self.app.motorPlan.isRunning()):
         return
       self.app.motorPlan.setDirection(Directions.NegY)
       self.app.MotorPlan.start()

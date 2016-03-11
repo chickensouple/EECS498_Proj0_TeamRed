@@ -42,10 +42,6 @@ class MainApp(JoyApp):
     self.timeForAuto = self.onceEvery(1/20.0)
 
   def onEvent(self, evt):
-    for motor in self.motors:
-      if (not motor.isRunning()):
-        motor.start()
-
     if self.timeForFilter():
       self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
