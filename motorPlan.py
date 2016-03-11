@@ -41,7 +41,7 @@ class MotorPlan(Plan):
     motors[0].set_torque(torque)
     motors[1].set_torque(-torque)
 
-    threshold = 0.2
+    threshold = 0.02
 
     while(abs(targetAng0 - motors[0].get_xpos()) > threshold and
       abs(targetAng1 - motors[1].get_xpos()) > threshold):
