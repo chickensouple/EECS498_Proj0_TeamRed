@@ -33,10 +33,10 @@ class MotorPlan(Plan):
 
 
     currAng0 = motors[0].get_xpos()
-    targetAng0 = currAng + currAng0
+    targetAng0 = currAng0 + angle
 
     currAng1 = motors[1].get_xpos()
-    targetAng1 = currAng - currAng1
+    targetAng1 = currAng0 - angle
 
     motors[0].set_torque(torque)
     motors[1].set_torque(-torque)
