@@ -26,7 +26,7 @@ class MotorPlan(Plan):
       motors = self.app.yMotors
       angle = self.angle
       torque = self.torque
-    elif (self.direction == Direcitons.NegY):
+    elif (self.direction == Directions.NegY):
       motors = self.app.yMotors
       angle = -self.angle
       torque = -self.torque
@@ -44,7 +44,7 @@ class MotorPlan(Plan):
     threshold = 0.2
 
     while(abs(targetAng0 - motors[0].get_xpos()) > threshold and
-      abs(targetAng1 - motors[1].get_xpos())):
+      abs(targetAng1 - motors[1].get_xpos()) > threshold):
       yield self.forDuration(0.05)
 
 
