@@ -85,7 +85,8 @@ class MainApp(JoyApp):
     return # ignoring non-KEYDOWN events
 
 
-robot = {"count": numMotors}
+# robot = {"count": numMotors}
+robot = {"count": numMotors, "port": dict(TYPE="tty", glob="/dev/ttyAcm0", baudrate=115200)}
 scr = {}
 
 if __name__=="__main__":
