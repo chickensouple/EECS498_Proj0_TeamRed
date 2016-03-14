@@ -19,7 +19,7 @@ class MainApp(JoyApp):
     self.srvAddr = (wphAddr, APRIL_DATA_PORT)
 
   def onStart(self):
-    self.xMotors = [self.robot.at.Nx02, self.robot.at.Nx04]
+    self.xMotors = [self.robot.at.Nx04, self.robot.at.Nx02]
     self.yMotors = [self.robot.at.Nx06, self.robot.at.Nx08]
 
     self.motorPlan = MotorPlan(self)
@@ -39,12 +39,17 @@ class MainApp(JoyApp):
     self.sensor.start()
 
     # Setup autonomous mode timer
-    self.timeForAuto = self.onceEvery(1/20.0)
+    self.timeForAuto = self.onceEvery(4)
 
   def onEvent(self, evt):
     if self.timeForFilter():
       self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
+      try:
+        print("Estimated Pos: " + str(self.core.particleFilter.getState().pos) + "\t" + str(self.core.particleFilter.getState().yaw))
+        print("Waypoints: " + str(self.sensor.lastWaypoints[1]))
+      except: 
+        pass
 
     if self.timeForAuto() and self.auto:
       self.core.autonomousPlanner.plan(self.sensor.lastWaypoints[1])
@@ -86,7 +91,7 @@ class MainApp(JoyApp):
 
 
 # robot = {"count": numMotors}
-robot = {"count": numMotors, "port": dict(TYPE="tty", glob="/dev/ttyAcm0", baudrate=115200)}
+robot = {"count": numMotors, "port": dict(TYPE="tty", glob="/dev/ttyACM0", baudrate=115200)}
 scr = {}
 
 if __name__=="__main__":

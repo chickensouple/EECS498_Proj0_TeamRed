@@ -142,12 +142,16 @@ class ParticleFilter:
 
   def correctR(self, sensorReal, sensor):
     # modify self.r if necessary
-    rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.mostProbable.yaw)
+    rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.coordinateFrames.getRealToWaypointYaw())
 
     # locations of the front and back sensor of most probable particle
     frontR = self.r + rotatedLength[0]
     backR = self.r - rotatedLength[0]
     waypointDist = norm(array(self.waypoints[1]) - array(self.waypoints[0]))
+
+    print("Sensor: " + str(sensor) + " estimated: " + str([frontR, backR]))
+
+
 
     if (sensorReal[1] == -1 and sensorReal[0] == -1):
       # we are completely not between waypoints
@@ -161,12 +165,12 @@ class ParticleFilter:
           # closest to start
           # decrease r
           print("Case 1 start")
-          self.r -= (waypointDist) / 10
+          self.r = 0
         else:
           # closest to end
           # increase r
           print("Case 1 end")
-          self.r += (waypointDist) / 10
+          self.r = waypointDist
     elif (sensorReal[1] == -1 or sensorReal[0] == -1):
       # one sensor is no longer in range of waypoints
       if (backR > 0 and frontR > 0 and backR < waypointDist and frontR < waypointDist):
@@ -266,8 +270,8 @@ class ParticleFilter:
     # Yawdiff measures how close the yaw of the particle is to our 
     # estimated yaw
     yawScalar = 50
-    yawDiff = yawScalar * abs(particle.yaw - self.mostProbable.yaw)
-    # yawDiff = yawScalar * abs(particle.yaw + self.coordinateFrames.getRealToWaypointYaw())
+    # yawDiff = yawScalar * abs(particle.yaw - self.mostProbable.yaw)
+    yawDiff = yawScalar * abs(particle.yaw + self.coordinateFrames.getRealToWaypointYaw())
 
     # scalar = 0.2231
     scalar = 0.11
