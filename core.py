@@ -12,7 +12,6 @@ class Core(Plan):
     self.mode = mode
     self.sim = None
 
-
     self.sensor = []
     self.waypoints = []
 
@@ -20,8 +19,6 @@ class Core(Plan):
     self.lastTime = 0
 
     self.coordinateFrames = CoordinateFrames()
-    # used to make sure that the end of the motion can be processed by the filter
-    self.startedMotion = False
 
     self.newSensor = False
 
@@ -30,7 +27,6 @@ class Core(Plan):
 
     self.autonomousPlanner = AutonomousPlanner(self)
 
-    self.lastMoveTime = 0
 
   def setSim(self, sim):
     self.sim = sim
@@ -42,11 +38,9 @@ class Core(Plan):
   def movePosX(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.PosX)
-    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveX(1)
-      self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(0)
       if (self.app.motorPlan.isRunning()):
@@ -57,11 +51,9 @@ class Core(Plan):
   def moveNegX(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.NegX)
-    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveX(-1)
-      self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(0)
       if (self.app.motorPlan.isRunning()):
@@ -72,11 +64,9 @@ class Core(Plan):
   def movePosY(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.PosY)
-    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveY(1)
-      self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(1)
       if (self.app.motorPlan.isRunning()):
@@ -87,11 +77,9 @@ class Core(Plan):
   def moveNegY(self):
     if (self.filterRunning):
       self.particleFilter.actionModel(Directions.NegY)
-    self.startedMotion = True
 
     if (self.mode == Mode.SIMULATION):
       self.sim.moveY(-1)
-      self.lastTime = clock()
     elif (self.mode == Mode.ACTUAL):
       # self.app.motorPlan.setMotorNum(1)
       if (self.app.motorPlan.isRunning()):
@@ -108,7 +96,7 @@ class Core(Plan):
 #########################
 ## FILTER
 #########################
-  def pushSensorAndWaypoints(self, sensor, waypoints):
+  def setSensorAndWaypoints(self, sensor, waypoints):
     self.sensor = sensor
     self.waypoints = waypoints
     self.particleFilter.setSensorAndWaypoints(self.sensor, self.waypoints)
@@ -127,16 +115,7 @@ class Core(Plan):
       if (self.newSensor):
         self.newSensor = False
         if (self.filterRunning):
-          if (not self.startedMotion and clock() - self.lastMoveTime > 2):
-            self.particleFilter.correct()
-
+          self.particleFilter.correct()
       yield
 
-
-      if (self.startedMotion):
-        if (not self.inMotion()):
-          self.startedMotion = False
-          self.lastMoveTime = clock()
-
-      # yield
 

@@ -116,7 +116,7 @@ class RobotSimulatorApp( JoyApp ):
       self.emitTagMessage()
 
     if self.timeForFilter():
-      self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
+      self.core.setSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
 
     if self.timeForAuto() and self.auto:

@@ -43,7 +43,7 @@ class MainApp(JoyApp):
 
   def onEvent(self, evt):
     if self.timeForFilter():
-      self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
+      self.core.setSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
       try:
         print("Estimated Pos: " + str(self.core.particleFilter.getState().pos) + "\t" + str(self.core.particleFilter.getState().yaw))
