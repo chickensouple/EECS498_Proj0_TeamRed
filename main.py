@@ -19,7 +19,7 @@ class MainApp(JoyApp):
     self.srvAddr = (wphAddr, APRIL_DATA_PORT)
 
   def onStart(self):
-    self.xMotors = [self.robot.at.Nx02, self.robot.at.Nx04]
+    self.xMotors = [self.robot.at.Nx04, self.robot.at.Nx02]
     self.yMotors = [self.robot.at.Nx06, self.robot.at.Nx08]
 
     self.motorPlan = MotorPlan(self)
