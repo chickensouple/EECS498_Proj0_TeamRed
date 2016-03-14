@@ -45,6 +45,11 @@ class MainApp(JoyApp):
     if self.timeForFilter():
       self.core.pushSensorAndWaypoints(array([self.sensor.lastSensor[1], self.sensor.lastSensor[2]]), 
         self.sensor.lastWaypoints[1])
+      try:
+        print("Estimated Pos: " + str(self.core.particleFilter.getState().pos) + "\t" + str(self.core.particleFilter.getState().yaw))
+        print("Waypoints: " + str(self.sensor.lastWaypoints[1]))
+      except: 
+        pass
 
     if self.timeForAuto() and self.auto:
       self.core.autonomousPlanner.plan(self.sensor.lastWaypoints[1])
