@@ -142,7 +142,7 @@ class ParticleFilter:
 
   def correctR(self, sensorReal, sensor):
     # modify self.r if necessary
-    rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.mostProbable.yaw)
+    rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.coordinateFrames.getRealToWaypointYaw())
 
     # locations of the front and back sensor of most probable particle
     frontR = self.r + rotatedLength[0]
@@ -153,7 +153,7 @@ class ParticleFilter:
       # we are completely not between waypoints
       if ((backR > 0 or backR < waypointDist) or
         (frontR > 0 or frontR < waypointDist)):
-        # our estimate is that one of our sensors is still
+        # our estimate is that at least one of our sensors is still
         # in range of waypoints
 
         # determine which end we are off of by looking at our current estimate
@@ -161,12 +161,12 @@ class ParticleFilter:
           # closest to start
           # decrease r
           print("Case 1 start")
-          self.r -= (waypointDist) / 10
+          self.r = abs(rotatedLength[0])
         else:
           # closest to end
           # increase r
           print("Case 1 end")
-          self.r += (waypointDist) / 10
+          self.r = waypointDist - abs(rotatedLength[0])
     elif (sensorReal[1] == -1 or sensorReal[0] == -1):
       # one sensor is no longer in range of waypoints
       if (backR > 0 and frontR > 0 and backR < waypointDist and frontR < waypointDist):
@@ -266,8 +266,8 @@ class ParticleFilter:
     # Yawdiff measures how close the yaw of the particle is to our 
     # estimated yaw
     yawScalar = 50
-    yawDiff = yawScalar * abs(particle.yaw - self.mostProbable.yaw)
-    # yawDiff = yawScalar * abs(particle.yaw + self.coordinateFrames.getRealToWaypointYaw())
+    # yawDiff = yawScalar * abs(particle.yaw - self.coordin)
+    yawDiff = yawScalar * abs(particle.yaw + self.coordinateFrames.getRealToWaypointYaw())
 
     # scalar = 0.2231
     scalar = 0.11
@@ -299,7 +299,7 @@ class ParticleFilter:
     travelDir = travelDist / Constants.wheelSideLength
  
 
-    rotatedTravelDist = CoordinateFrames.rotateCCW(travelDist, self.mostProbable.yaw)
+    rotatedTravelDist = CoordinateFrames.rotateCCW(travelDist, self.coordinateFrames.getRealToWaypointYaw())
 
     self.r += rotatedTravelDist[0]
 
