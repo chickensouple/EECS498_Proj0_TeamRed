@@ -30,6 +30,8 @@ class Core(Plan):
 
     self.autonomousPlanner = AutonomousPlanner(self)
 
+    self.lastMoveTime = 0
+
   def setSim(self, sim):
     self.sim = sim
 
@@ -125,14 +127,16 @@ class Core(Plan):
       if (self.newSensor):
         self.newSensor = False
         if (self.filterRunning):
-          self.particleFilter.correct()
+          if (not self.startedMotion and clock() - self.lastMoveTime > 2):
+            self.particleFilter.correct()
 
       yield
 
 
-      # if (self.startedMotion):
-      #   if (not self.inMotion):
-      #     self.startedMotion = False
+      if (self.startedMotion):
+        if (not self.inMotion()):
+          self.startedMotion = False
+          self.lastMoveTime = clock()
 
       # yield
 

@@ -157,7 +157,7 @@ class ParticleFilter:
       # we are completely not between waypoints
       if ((backR > 0 or backR < waypointDist) or
         (frontR > 0 or frontR < waypointDist)):
-        # our estimate is that one of our sensors is still
+        # our estimate is that at least one of our sensors is still
         # in range of waypoints
 
         # determine which end we are off of by looking at our current estimate
@@ -303,7 +303,7 @@ class ParticleFilter:
     travelDir = travelDist / Constants.wheelSideLength
  
 
-    rotatedTravelDist = CoordinateFrames.rotateCCW(travelDist, self.mostProbable.yaw)
+    rotatedTravelDist = CoordinateFrames.rotateCCW(travelDist, self.coordinateFrames.getRealToWaypointYaw())
 
     self.r += rotatedTravelDist[0]
 
