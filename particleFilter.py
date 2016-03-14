@@ -142,7 +142,7 @@ class ParticleFilter:
 
   def correctR(self, sensorReal, sensor):
     # modify self.r if necessary
-    rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], self.coordinateFrames.getRealToWaypointYaw())
+    rotatedLength = CoordinateFrames.rotateCCW([Constants.tagLength, 0], -self.coordinateFrames.getRealToWaypointYaw())
 
     # locations of the front and back sensor of most probable particle
     frontR = self.r + rotatedLength[0]
@@ -299,7 +299,7 @@ class ParticleFilter:
     travelDir = travelDist / Constants.wheelSideLength
  
 
-    rotatedTravelDist = CoordinateFrames.rotateCCW(travelDist, self.coordinateFrames.getRealToWaypointYaw())
+    rotatedTravelDist = CoordinateFrames.rotateCCW(travelDist, -self.coordinateFrames.getRealToWaypointYaw())
 
     self.r += rotatedTravelDist[0]
 
