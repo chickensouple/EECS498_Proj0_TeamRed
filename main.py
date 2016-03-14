@@ -39,7 +39,7 @@ class MainApp(JoyApp):
     self.sensor.start()
 
     # Setup autonomous mode timer
-    self.timeForAuto = self.onceEvery(1/20.0)
+    self.timeForAuto = self.onceEvery(4)
 
   def onEvent(self, evt):
     if self.timeForFilter():
